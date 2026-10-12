@@ -1,0 +1,14 @@
+{
+  "name": "FinkForge.Tests.EditMode",
+  "rootNamespace": "FinkForge.Tests",
+  "references": [ "FinkForge.Runtime", "UniTask", "UnityEngine.TestRunner", "UnityEditor.TestRunner" ],
+  "includePlatforms": [ "Editor" ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [ "UNITY_INCLUDE_TESTS" ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

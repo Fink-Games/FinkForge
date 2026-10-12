@@ -1,0 +1,97 @@
+using System;
+using UnityEngine;
+using FinkForge.Application;
+using FinkForge.Config;
+using FinkForge.Device;
+using FinkForge.Environment;
+using FinkForge.Game;
+using FinkForge.Inactivity;
+using FinkForge.Players;
+using FinkForge.Transport;
+using Cysharp.Threading.Tasks;
+
+namespace FinkForge.Core
+{
+    internal sealed class FinkRuntime
+    {
+        private static readonly Lazy<FinkRuntime> Lazy = new Lazy<FinkRuntime>(() => new FinkRuntime());
+        public static FinkRuntime Instance => Lazy.Value;
+
+        private readonly FinkRuntimeState _state = new FinkRuntimeState();
+        private readonly FinkEnvironment _environment = new FinkEnvironment();
+        private readonly FinkHttpTransport _transport;
+        private readonly FinishDeliveryOutbox _finishOutbox;
+        private readonly FinkForgeSettingsService _settings;
+
+        public readonly PlayerService Players;
+        public readonly ConfigService Config;
+        public readonly GameService App;
+        public readonly DeviceService Device;
+        private readonly HeartbeatService _heartbeat;
+        private readonly InactivityService _inactivity;
+        private readonly ApplicationService _application;
+
+        private FinkRuntime()
+        {
+            _transport = new FinkHttpTransport(_environment);
+            _finishOutbox = new FinishDeliveryOutbox(_transport);
+            _settings = new FinkForgeSettingsService();
+            Config = new ConfigService();
+            Players = new PlayerService(() => _state.CurrentSession?.State ?? FinkSessionState.None,
+                () => Config.ScoreEnabled);
+            _heartbeat = new HeartbeatService(_transport);
+            App = new GameService(Players, Config, _finishOutbox, _heartbeat, _state, _settings);
+            _inactivity = new InactivityService(Config);
+            _application = new ApplicationService(App.Quit);
+            Device = new DeviceService(_finishOutbox, RequestQuit);
+            Players.AllPlayersLeft += RequestQuit;
+            UnityEngine.Application.logMessageReceived += OnLogMessage;
+        }
+
+        public void BeginInitialization()
+        {
+            if (_state.Initialization != FinkInitializationState.None) return;
+            _state.Initialization = FinkInitializationState.Initializing;
+            InitializeAsync().Forget();
+        }
+
+        private async UniTask InitializeAsync()
+        {
+            try
+            {
+                await UniTask.SwitchToMainThread();
+                _environment.Resolve();
+                _transport.Prepare();
+                await _transport.LoadBootstrapDataAsync(Players, Config);
+                _inactivity.Start();
+                _state.Initialization = FinkInitializationState.Ready;
+                App.FlushPendingStart();
+            }
+            catch (Exception exception)
+            {
+                _state.Initialization = FinkInitializationState.Failed;
+                App.CancelPendingStart();
+                Debug.LogError($"[Fink Forge] Initialization failed: {exception.Message}");
+            }
+        }
+
+        public void Tick()
+        {
+            _inactivity.Tick();
+            _heartbeat.Tick(Time.realtimeSinceStartup);
+            _finishOutbox.ProcessPending(Time.realtimeSinceStartup);
+        }
+
+        public void RequestQuit() => _application.Quit();
+
+        private void OnLogMessage(string condition, string stackTrace, LogType type)
+        {
+            if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert)
+                return;
+
+            var reasonType = type == LogType.Exception ? "crash" : "error";
+            Device.ReportAutomaticIncident(reasonType, condition, stackTrace);
+        }
+
+    }
+}

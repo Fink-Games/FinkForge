@@ -1,0 +1,10 @@
+{
+  "name": "com.finkgames.finkforge",
+  "version": "0.1.0",
+  "displayName": "Fink Forge",
+  "description": "Lightweight runtime boundary between Fink game tables and Unity games.",
+  "unity": "6000.3",
+  "author": { "name": "Fink Games" },
+  "keywords": [ "fink", "games", "runtime" ],
+  "dependencies": {}
+}
