@@ -26,10 +26,10 @@ Unity Editor'de çalışırken backend bağlantısının terminal ortamına akta
 Unity CLI kullanıyorsanız önerilen komut, proje klasörünün bulunduğu dizinden çalıştırmaktır:
 
 ```bash
-unity ./FinkForge
+unity ./<Project-path>
 ```
 
-Bu komut macOS, Windows ve Linux'ta Unity CLI tarafından desteklenir. `./FinkForge` yerine kendi Unity proje klasörünüzün yolunu yazın.
+Bu komut macOS, Windows ve Linux'ta Unity CLI tarafından desteklenir. `./<Project-path>` yerine kendi Unity proje klasörünüzün yolunu yazın.
 
 Unity executable'ını doğrudan çağırmanız gerekirse işletim sistemine göre genel biçimler şöyledir:
 

@@ -18,10 +18,10 @@ When working in the Unity Editor, pass the backend connection settings to the Un
 When using the Unity CLI, the recommended command is run from the directory that contains the project:
 
 ```bash
-unity ./FinkForge
+unity ./<Project-path>
 ```
 
-This command is supported by the Unity CLI on macOS, Windows, and Linux. Replace `./FinkForge` with your Unity project folder.
+This command is supported by the Unity CLI on macOS, Windows, and Linux. Replace `./<Project-path>` with your Unity project folder.
 
 If you need to invoke the Unity executable directly, use the platform-specific forms below:
 
