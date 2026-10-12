@@ -15,10 +15,23 @@ When working in the Unity Editor, pass the backend connection settings to the Un
 3. Paste and run the copied command in a terminal.
 4. Launch the Unity Editor from that same terminal using the Unity CLI.
 
-The general Unity CLI form on macOS is:
+The general Unity CLI forms are:
 
+macOS:
 ```bash
 /Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
+  -projectPath "/path/to/your/unity-project"
+```
+
+Windows PowerShell:
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\<unity-version>\Editor\Unity.exe" `
+  -projectPath "C:\path\to\your\unity-project"
+```
+
+Linux:
+```bash
+<unity-install-path>/Editor/Unity \\
   -projectPath "/path/to/your/unity-project"
 ```
 

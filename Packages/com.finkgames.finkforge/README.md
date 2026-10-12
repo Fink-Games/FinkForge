@@ -23,10 +23,23 @@ Unity Editor'de çalışırken backend bağlantısının terminal ortamına akta
 3. Açık bir terminale kopyalanan komutu yapıştırıp çalıştırın.
 4. Unity Editor'ü aynı terminalden Unity CLI ile açın.
 
-macOS için genel Unity CLI biçimi şöyledir:
+İşletim sistemine göre genel Unity CLI biçimleri şöyledir:
 
+macOS:
 ```bash
 /Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
+  -projectPath "/path/to/your/unity-project"
+```
+
+Windows PowerShell:
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\<unity-version>\Editor\Unity.exe" `
+  -projectPath "C:\path\to\your\unity-project"
+```
+
+Linux:
+```bash
+<unity-install-path>/Editor/Unity \\
   -projectPath "/path/to/your/unity-project"
 ```
 
