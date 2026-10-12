@@ -4,6 +4,16 @@ This guide explains how Unity game code communicates with the Fink Forge runtime
 
 The goal is to let game managers handle lifecycle, players, scores, configuration, and shutdown without knowing HTTP endpoints, JSON payloads, API keys, or retry details.
 
+## Install the package
+
+In Unity Package Manager, select `Add package from git URL...` and enter:
+
+```text
+https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#main
+```
+
+This URL is for development and testing. For published games, use a fixed release tag; when the first release exists, replace `#main` with `#v0.1.0`. After the package is installed, complete the [Fink Forge application and Unity Editor setup](#0-install-fink-forge-and-connect-the-unity-editor).
+
 ## 0. Install Fink Forge and connect the Unity Editor
 
 Before using the Fink Forge package, download and run the Fink Forge application from the [official installation page](https://dev.fink.games/docs/fink-forge/install).
