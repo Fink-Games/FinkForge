@@ -17,10 +17,10 @@ Fink Forge'un public API'si özellikle küçük tutulmuştur. Oyun kodu HTTP end
 Unity Package Manager üzerinden `Add package from git URL...` seçeneğini açın ve package URL'sini girin:
 
 ```text
-https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#main
+https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#v0.1.0
 ```
 
-Bu URL geliştirme ve test içindir. Yayınlanan oyunlarda sabit bir release tag'i kullanın; örneğin release oluşturulduğunda `#main` yerine `#v0.1.0` yazın. Package kurulduktan sonra [Fink Forge uygulamasını ve Unity Editor bağlantısını hazırlama](#0-fink-forge-uygulamasını-ve-editor-bağlantısını-hazırlama) adımlarını tamamlayın.
+Yayınlanan oyunlarda sabit release tag'i kullanın. Geliştirme veya test için URL sonundaki `#v0.1.0` yerine `#main` yazabilirsiniz. Package kurulduktan sonra [Fink Forge uygulamasını ve Unity Editor bağlantısını hazırlama](#0-fink-forge-uygulamasını-ve-editor-bağlantısını-hazırlama) adımlarını tamamlayın.
 
 ## 0. Fink Forge uygulamasını ve Editor bağlantısını hazırlama
 
