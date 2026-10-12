@@ -23,7 +23,15 @@ Unity Editor'de çalışırken backend bağlantısının terminal ortamına akta
 3. Açık bir terminale kopyalanan komutu yapıştırıp çalıştırın.
 4. Unity Editor'ü aynı terminalden Unity CLI ile açın.
 
-İşletim sistemine göre genel Unity CLI biçimleri şöyledir:
+Unity CLI kullanıyorsanız önerilen komut, proje klasörünün bulunduğu dizinden çalıştırmaktır:
+
+```bash
+unity ./FinkForge
+```
+
+Bu komut macOS, Windows ve Linux'ta Unity CLI tarafından desteklenir. `./FinkForge` yerine kendi Unity proje klasörünüzün yolunu yazın.
+
+Unity executable'ını doğrudan çağırmanız gerekirse işletim sistemine göre genel biçimler şöyledir:
 
 macOS:
 ```bash

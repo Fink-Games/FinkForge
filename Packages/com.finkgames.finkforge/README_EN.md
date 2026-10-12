@@ -15,7 +15,15 @@ When working in the Unity Editor, pass the backend connection settings to the Un
 3. Paste and run the copied command in a terminal.
 4. Launch the Unity Editor from that same terminal using the Unity CLI.
 
-The general Unity CLI forms are:
+When using the Unity CLI, the recommended command is run from the directory that contains the project:
+
+```bash
+unity ./FinkForge
+```
+
+This command is supported by the Unity CLI on macOS, Windows, and Linux. Replace `./FinkForge` with your Unity project folder.
+
+If you need to invoke the Unity executable directly, use the platform-specific forms below:
 
 macOS:
 ```bash
