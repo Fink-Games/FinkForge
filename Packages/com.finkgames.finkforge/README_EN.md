@@ -4,6 +4,26 @@ This guide explains how Unity game code communicates with the Fink Forge runtime
 
 The goal is to let game managers handle lifecycle, players, scores, configuration, and shutdown without knowing HTTP endpoints, JSON payloads, API keys, or retry details.
 
+## 0. Install Fink Forge and connect the Unity Editor
+
+Before using the Fink Forge package, download and run the Fink Forge application from the [official installation page](https://dev.fink.games/docs/fink-forge/install).
+
+When working in the Unity Editor, pass the backend connection settings to the Unity process:
+
+1. Open the Fink Forge application.
+2. Click `Copy Editor settings`.
+3. Paste and run the copied command in a terminal.
+4. Launch the Unity Editor from that same terminal using the Unity CLI.
+
+The general Unity CLI form on macOS is:
+
+```bash
+/Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
+  -projectPath "/path/to/your/unity-project"
+```
+
+If Unity is opened from another terminal, Finder, or Unity Hub, the copied `FINK_API_PORT` and `FINK_API_KEY` values are not inherited by the Unity process. The settings are valid for one hour; after that, use `Copy Editor settings` again.
+
 ## 1. Public API overview
 
 ```csharp

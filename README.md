@@ -12,6 +12,26 @@ Amaç, oyun içindeki manager sınıflarının backend detaylarını bilmeden ş
 
 Fink Forge'un public API'si özellikle küçük tutulmuştur. Oyun kodu HTTP endpoint'leri, API key veya outbox/retry ayrıntılarıyla ilgilenmez.
 
+## 0. Fink Forge uygulamasını ve Editor bağlantısını hazırlama
+
+Fink Forge package'ını kullanmadan önce Fink Forge uygulamasını [resmi kurulum sayfasından](https://dev.fink.games/docs/fink-forge/install) indirin ve çalıştırın.
+
+Unity Editor'de çalışırken backend bağlantısının terminal ortamına aktarılması gerekir:
+
+1. Fink Forge uygulamasını açın.
+2. Uygulamadaki `Copy Editor settings` butonuna basın.
+3. Açık bir terminale kopyalanan komutu yapıştırıp çalıştırın.
+4. Unity Editor'ü aynı terminalden Unity CLI ile açın.
+
+macOS için genel Unity CLI biçimi şöyledir:
+
+```bash
+/Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
+  -projectPath "/path/to/your/unity-project"
+```
+
+Unity'yi farklı bir terminalden veya Finder/Unity Hub üzerinden açarsanız kopyalanan `FINK_API_PORT` ve `FINK_API_KEY` değerleri Unity process'ine aktarılmaz. Ayarlar bir saat geçerlidir; süre dolduğunda Fink Forge uygulamasından yeniden `Copy Editor settings` alın.
+
 ## 1. Public API özeti
 
 ```csharp
