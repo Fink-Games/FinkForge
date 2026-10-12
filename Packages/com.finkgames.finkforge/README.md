@@ -15,6 +15,7 @@ Fink Forge'un public API'si özellikle küçük tutulmuştur. Oyun kodu HTTP end
 ## 0. Fink Forge uygulamasını ve Editor bağlantısını hazırlama
 
 Fink Forge package'ını kullanmadan önce Fink Forge uygulamasını [resmi kurulum sayfasından](https://dev.fink.games/docs/fink-forge/install) indirin ve çalıştırın.
+Unity CLI'nin sisteminizde kurulu ve `unity` komutunun terminalden erişilebilir olduğundan emin olun.
 
 Unity Editor'de çalışırken backend bağlantısının terminal ortamına aktarılması gerekir:
 
@@ -30,26 +31,6 @@ unity ./<Project-path>
 ```
 
 Bu komut macOS, Windows ve Linux'ta Unity CLI tarafından desteklenir. `./<Project-path>` yerine kendi Unity proje klasörünüzün yolunu yazın.
-
-Unity executable'ını doğrudan çağırmanız gerekirse işletim sistemine göre genel biçimler şöyledir:
-
-macOS:
-```bash
-/Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
-  -projectPath "/path/to/your/unity-project"
-```
-
-Windows PowerShell:
-```powershell
-& "C:\Program Files\Unity\Hub\Editor\<unity-version>\Editor\Unity.exe" `
-  -projectPath "C:\path\to\your\unity-project"
-```
-
-Linux:
-```bash
-<unity-install-path>/Editor/Unity \\
-  -projectPath "/path/to/your/unity-project"
-```
 
 Unity'yi farklı bir terminalden veya Finder/Unity Hub üzerinden açarsanız kopyalanan `FINK_API_PORT` ve `FINK_API_KEY` değerleri Unity process'ine aktarılmaz. Ayarlar bir saat geçerlidir; süre dolduğunda Fink Forge uygulamasından yeniden `Copy Editor settings` alın.
 

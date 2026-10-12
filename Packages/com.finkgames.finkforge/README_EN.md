@@ -7,6 +7,7 @@ The goal is to let game managers handle lifecycle, players, scores, configuratio
 ## 0. Install Fink Forge and connect the Unity Editor
 
 Before using the Fink Forge package, download and run the Fink Forge application from the [official installation page](https://dev.fink.games/docs/fink-forge/install).
+Make sure the Unity CLI is installed and that the `unity` command is available in your terminal.
 
 When working in the Unity Editor, pass the backend connection settings to the Unity process:
 
@@ -22,26 +23,6 @@ unity ./<Project-path>
 ```
 
 This command is supported by the Unity CLI on macOS, Windows, and Linux. Replace `./<Project-path>` with your Unity project folder.
-
-If you need to invoke the Unity executable directly, use the platform-specific forms below:
-
-macOS:
-```bash
-/Applications/Unity/Hub/Editor/<unity-version>/Unity.app/Contents/MacOS/Unity \\
-  -projectPath "/path/to/your/unity-project"
-```
-
-Windows PowerShell:
-```powershell
-& "C:\Program Files\Unity\Hub\Editor\<unity-version>\Editor\Unity.exe" `
-  -projectPath "C:\path\to\your\unity-project"
-```
-
-Linux:
-```bash
-<unity-install-path>/Editor/Unity \\
-  -projectPath "/path/to/your/unity-project"
-```
 
 If Unity is opened from another terminal, Finder, or Unity Hub, the copied `FINK_API_PORT` and `FINK_API_KEY` values are not inherited by the Unity process. The settings are valid for one hour; after that, use `Copy Editor settings` again.
 
