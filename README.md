@@ -90,6 +90,12 @@ using FinkForge;
 | Launch nonce | `Fink.Launch.LaunchNonce` |
 | API key | `Fink.Launch.ApiKey` |
 | API port | `Fink.Launch.ApiPort` |
+| Public verification key (base64) | `Fink.Launch.AccessTokenPublicKeyB64` |
+| Token issuer | `Fink.Launch.AccessTokenIssuer` |
+| Token audience | `Fink.Launch.AccessTokenAudience` |
+| Token purpose | `Fink.Launch.AccessTokenPurpose` |
+| Token algorithm | `Fink.Launch.AccessTokenAlgorithm` |
+| Token clock skew (seconds) | `Fink.Launch.TokenClockSkewSeconds` |
 
 `Fink.App.End()` skor gönderimini başlatan oyun bitişi çağrısıdır. Gönderim tamamlandığında `Fink.App.OnScoresSent` yayınlanır. Unity/process kapanışı için `Fink.Application.Quit()` kullanılır.
 
@@ -126,9 +132,15 @@ FINK_DEVICE_ID=<device-id>
 FINK_LAUNCH_NONCE=<launch-nonce>
 FINK_API_KEY=<secret>
 FINK_API_PORT=<port>
+FINK_ACCESS_TOKEN_PUBLIC_KEY_B64=<base64-public-key>
+FINK_ACCESS_TOKEN_ISSUER=<issuer>
+FINK_ACCESS_TOKEN_AUDIENCE=<audience>
+FINK_ACCESS_TOKEN_PURPOSE=<purpose>
+FINK_ACCESS_TOKEN_ALGORITHM=<algorithm>
+FINK_ACCESS_TOKEN_CLOCK_SKEW=<seconds>
 ```
 
-Altı değerin tamamı zorunludur. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksikse runtime initialization başarısız olur ve context yüklenmez.
+On iki değerin tamamı zorunludur. Public key base64 olarak okunur ve gerektiğinde PEM formatına dönüştürülür. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksik ya da clock skew geçersizse runtime initialization başarısız olur ve context yüklenmez.
 
 Launch değerlerini diagnostic amaçlı okuyabilirsiniz:
 
@@ -138,7 +150,7 @@ string deviceId = Fink.Launch.DeviceId;
 string port = Fink.Launch.ApiPort;
 ```
 
-Access token, API key, installation ID, device ID ve launch nonce Unity asset'lerine serialize edilmez; diagnostic loglarda secret değerler yazdırılmaz.
+Access token, API key, installation ID, device ID, launch nonce ve public key Unity asset'lerine serialize edilmez; diagnostic loglarda secret veya kişisel launch değerleri yazdırılmaz.
 
 ### Access token doğrulama
 

@@ -57,6 +57,13 @@ namespace FinkForge
             public static string LaunchNonce => FinkRuntime.Instance.LaunchNonce;
             public static string ApiKey => FinkRuntime.Instance.LaunchApiKey;
             public static string ApiPort => FinkRuntime.Instance.LaunchApiPort;
+            public static string AccessTokenPublicKeyB64 => FinkRuntime.Instance.LaunchAccessTokenPublicKeyB64;
+            public static string AccessTokenIssuer => FinkRuntime.Instance.LaunchAccessTokenIssuer;
+            public static string AccessTokenAudience => FinkRuntime.Instance.LaunchAccessTokenAudience;
+            public static string AccessTokenPurpose => FinkRuntime.Instance.LaunchAccessTokenPurpose;
+            public static string AccessTokenAlgorithm => FinkRuntime.Instance.LaunchAccessTokenAlgorithm;
+            public static int TokenClockSkewSeconds => FinkRuntime.Instance.LaunchTokenClockSkewSeconds;
+            public static string AccessTokenPublicKeyPem => FinkRuntime.Instance.LaunchAccessTokenPublicKeyPem;
         }
 
         public static class App

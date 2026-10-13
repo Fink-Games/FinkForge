@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Added Electron-exported access-token verification metadata to `Fink.Launch`.
+- Added base64 public-key validation and PEM conversion, plus integer clock-skew validation.
+- Kept token verification independent from FinkAPI and excluded private signing keys from the package.
+
 ## 0.3.0
 
 - Added Electron launch environment support for access token, installation ID, device ID, launch nonce, API key, and API port.

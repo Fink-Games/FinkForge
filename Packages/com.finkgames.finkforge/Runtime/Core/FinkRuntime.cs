@@ -99,6 +99,13 @@ namespace FinkForge.Core
         public string LaunchNonce => _environment.LaunchNonce;
         public string LaunchApiKey => _environment.ApiKey;
         public string LaunchApiPort => _environment.ApiPort;
+        public string LaunchAccessTokenPublicKeyB64 => _environment.AccessTokenPublicKeyB64;
+        public string LaunchAccessTokenIssuer => _environment.AccessTokenIssuer;
+        public string LaunchAccessTokenAudience => _environment.AccessTokenAudience;
+        public string LaunchAccessTokenPurpose => _environment.AccessTokenPurpose;
+        public string LaunchAccessTokenAlgorithm => _environment.AccessTokenAlgorithm;
+        public int LaunchTokenClockSkewSeconds => _environment.TokenClockSkewSeconds;
+        public string LaunchAccessTokenPublicKeyPem => _environment.AccessTokenPublicKeyPem;
 
         private void OnLogMessage(string condition, string stackTrace, LogType type)
         {
