@@ -21,7 +21,8 @@ namespace FinkForge.Application
         private async UniTaskVoid ShutdownAsync()
         {
             // Give the score/end outbox a bounded window to complete its first request.
-            await UniTask.Delay(TimeSpan.FromSeconds(3));
+            // Quit must complete even when the game is paused or timeScale is zero.
+            await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: true);
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
