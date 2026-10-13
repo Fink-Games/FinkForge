@@ -84,6 +84,11 @@ namespace FinkForge.Core
 
         public void RequestQuit() => _application.Quit();
 
+        public void ConfigureGame(string gameName)
+        {
+            _settings.ConfigureGame(gameName);
+        }
+
         private void OnLogMessage(string condition, string stackTrace, LogType type)
         {
             if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert)

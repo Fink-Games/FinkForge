@@ -6,6 +6,7 @@ namespace FinkForge.Config
     {
         private const string ResourceName = "FinkForgeConfig";
         private FinkForgeConfig _cachedConfig;
+        private string _runtimeGameName;
         private bool _hasLoaded;
 
         internal FinkForgeSettingsService() { }
@@ -28,7 +29,29 @@ namespace FinkForge.Config
             }
         }
 
-        public string GameName => Config?.GameName ?? string.Empty;
+        public string GameName
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(_runtimeGameName))
+                    return _runtimeGameName;
+
+                return Config?.GameName?.Trim() ?? string.Empty;
+            }
+        }
+
+        internal bool ConfigureGame(string gameName)
+        {
+            if (string.IsNullOrWhiteSpace(gameName))
+            {
+                Debug.LogWarning("[Fink Forge] ConfigureGame ignored because gameName is empty.");
+                return false;
+            }
+
+            _runtimeGameName = gameName.Trim();
+            return true;
+        }
+
         public bool IsConfigured => Config != null;
     }
 }

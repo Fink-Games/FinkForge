@@ -48,7 +48,7 @@ namespace FinkForge.Game
 
             runtimeState.PendingStart = false;
             players.ClearScores();
-            var session = new FinkSession();
+            var session = new FinkSession(settings.GameName);
             runtimeState.CurrentSession = session;
             EnqueueAppStart(session);
         }
@@ -123,7 +123,7 @@ namespace FinkForge.Game
             var wasActive = current.State == FinkSessionState.Active;
             current.State = FinkSessionState.Finished;
             players.ClearScores();
-            var nextSession = new FinkSession();
+            var nextSession = new FinkSession(settings.GameName);
             runtimeState.CurrentSession = nextSession;
             if (wasActive)
                 EnqueueAppRestart(nextSession);
@@ -223,7 +223,7 @@ namespace FinkForge.Game
         {
             if (!config.ScoreEnabled) return null;
             if (session.ScoreDeliveryRequested || !players.ScoresTouched) return null;
-            if (string.IsNullOrWhiteSpace(settings.GameName))
+            if (string.IsNullOrWhiteSpace(session.GameName))
             {
                 Debug.LogWarning("[Fink Forge] Score delivery skipped because the authoritative gameName is not configured.");
                 return null;
@@ -241,7 +241,7 @@ namespace FinkForge.Game
 
                 var teamPayload = new TeamScorePayload
                 {
-                    gameName = settings.GameName,
+                    gameName = session.GameName,
                     playerCount = config.PlayerCount,
                     teams = System.Array.ConvertAll(teams, team => new TeamScoreEntry
                     {
@@ -261,7 +261,7 @@ namespace FinkForge.Game
 
             var playerPayload = new PlayerScorePayload
             {
-                gameName = settings.GameName,
+                gameName = session.GameName,
                 playerCount = config.PlayerCount,
                 players = System.Array.ConvertAll(scores, score => new PlayerScoreEntry
                 {

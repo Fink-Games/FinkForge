@@ -13,12 +13,15 @@ namespace FinkForge.Core
         public bool ScoreDeliveryRequested { get; set; }
         public bool EndRequested { get; set; }
 
-        public FinkSession()
+        public FinkSession(string gameName)
         {
             Id = Guid.NewGuid().ToString("N");
             StartedAtUtc = DateTime.UtcNow;
+            GameName = gameName ?? string.Empty;
             State = FinkSessionState.Active;
         }
+
+        public string GameName { get; }
     }
 
     internal sealed class FinkRuntimeState

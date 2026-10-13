@@ -17,10 +17,23 @@ Fink Forge'un public API'si özellikle küçük tutulmuştur. Oyun kodu HTTP end
 Unity Package Manager üzerinden `Add package from git URL...` seçeneğini açın ve package URL'sini girin:
 
 ```text
-https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#v0.1.0
+https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#main
 ```
 
-Yayınlanan oyunlarda sabit release tag'i kullanın. Geliştirme veya test için URL sonundaki `#v0.1.0` yerine `#main` yazabilirsiniz. Package kurulduktan sonra [Fink Forge uygulamasını ve Unity Editor bağlantısını hazırlama](#0-fink-forge-uygulamasını-ve-editor-bağlantısını-hazırlama) adımlarını tamamlayın.
+Bu URL geliştirme ve test içindir. Yayınlanan oyunlarda package sürümüyle eşleşen sabit release tag'i kullanın; bu feature'ın release'i `v0.2.0` olacaktır. Package kurulduktan sonra [Fink Forge uygulamasını ve Unity Editor bağlantısını hazırlama](#0-fink-forge-uygulamasını-ve-editor-bağlantısını-hazırlama) adımlarını tamamlayın.
+
+### Birden fazla oyun/proje kullanımı
+
+Aynı Unity projesinde birden fazla oyun profili kullanıyorsanız, `Fink.App.Start()` çağrısından önce aktif oyunun adını runtime'da belirtin:
+
+```csharp
+using FinkForge;
+
+Fink.App.ConfigureGame("SumoFight");
+Fink.App.Start();
+```
+
+Package şu sırayı kullanır: runtime'da verilen geçerli ad, `Resources/FinkForgeConfig.asset` içindeki `gameName`, boş string. Runtime adı aktif session sırasında değiştirilirse mevcut session'ın score payload'ı değişmez; yeni session veya restart sonrasında yeni ad kullanılır.
 
 ## 0. Fink Forge uygulamasını ve Editor bağlantısını hazırlama
 

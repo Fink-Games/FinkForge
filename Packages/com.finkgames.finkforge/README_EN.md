@@ -9,10 +9,23 @@ The goal is to let game managers handle lifecycle, players, scores, configuratio
 In Unity Package Manager, select `Add package from git URL...` and enter:
 
 ```text
-https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#v0.1.0
+https://github.com/Fink-Games/FinkForge.git?path=/Packages/com.finkgames.finkforge#main
 ```
 
-Use a fixed release tag for published games. For development or testing, replace `#v0.1.0` at the end of the URL with `#main`. After the package is installed, complete the [Fink Forge application and Unity Editor setup](#0-install-fink-forge-and-connect-the-unity-editor).
+This URL is for development and testing. For published games, use a fixed release tag matching the package version; this feature will be released as `v0.2.0`. After the package is installed, complete the [Fink Forge application and Unity Editor setup](#0-install-fink-forge-and-connect-the-unity-editor).
+
+### Using multiple games or projects
+
+If the same Unity project hosts multiple game profiles, configure the active game at runtime before calling `Fink.App.Start()`:
+
+```csharp
+using FinkForge;
+
+Fink.App.ConfigureGame("SumoFight");
+Fink.App.Start();
+```
+
+The package uses this priority: a valid runtime name, `gameName` from `Resources/FinkForgeConfig.asset`, then an empty string. Changing the runtime name during an active session does not alter that session's score payload; the new name is used by a new session or restart.
 
 ## 0. Install Fink Forge and connect the Unity Editor
 

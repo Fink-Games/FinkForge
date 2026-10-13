@@ -64,6 +64,7 @@ namespace FinkForge
             public static void Restart() => FinkRuntime.Instance.App.Restart();
             public static void End() => FinkRuntime.Instance.App.End();
             public static void SendScores() => FinkRuntime.Instance.App.SendScores();
+            public static void ConfigureGame(string gameName) => FinkRuntime.Instance.ConfigureGame(gameName);
         }
 
     }

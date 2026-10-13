@@ -19,6 +19,7 @@ namespace FinkForge.Tests
         private FinishDeliveryOutbox outbox;
         private GameService game;
         private FinkForgeConfig configAsset;
+        private FinkForgeSettingsService settings;
 
         [SetUp]
         public void SetUp()
@@ -33,7 +34,8 @@ namespace FinkForge.Tests
             transport = new RecordingTransport();
             outbox = new FinishDeliveryOutbox(transport);
             var heartbeat = new HeartbeatService(transport);
-            game = new GameService(players, config, outbox, heartbeat, state, new FinkForgeSettingsService(configAsset));
+            settings = new FinkForgeSettingsService(configAsset);
+            game = new GameService(players, config, outbox, heartbeat, state, settings);
         }
 
         [TearDown]
@@ -98,6 +100,67 @@ namespace FinkForge.Tests
             StringAssert.Contains("\"score\":0", transport.ScorePayload);
             Assert.AreEqual(FinkDeliveryType.IndividualScores, transport.LastDelivery.Type);
             Assert.AreEqual(FinkSessionState.Finished, state.CurrentSession.State);
+        }
+
+        [Test]
+        public void SettingsUseAssetGameNameWhenNoRuntimeOverrideExists()
+        {
+            Assert.AreEqual("test-game", settings.GameName);
+        }
+
+        [Test]
+        public void ConfigureGameTrimsAndOverridesAssetGameName()
+        {
+            Assert.IsTrue(settings.ConfigureGame("  SumoFight  "));
+            Assert.AreEqual("SumoFight", settings.GameName);
+        }
+
+        [Test]
+        public void ConfigureGameIgnoresWhitespaceAndKeepsAssetGameName()
+        {
+            Assert.IsFalse(settings.ConfigureGame("  \t"));
+            Assert.AreEqual("test-game", settings.GameName);
+        }
+
+        [Test]
+        public void ConfigureGameBeforeStartIsUsedByScorePayload()
+        {
+            settings.ConfigureGame("SumoFight");
+            players.ReplacePlayers(new[] { new FinkPlayer(0, "Player 1") });
+            game.Start();
+            players.SetScore(0, 100);
+            game.End();
+
+            StringAssert.Contains("\"gameName\":\"SumoFight\"", transport.ScorePayload);
+        }
+
+        [Test]
+        public void ConfigureGameDuringActiveSessionDoesNotChangeItsScorePayload()
+        {
+            players.ReplacePlayers(new[] { new FinkPlayer(0, "Player 1") });
+            game.Start();
+            settings.ConfigureGame("NextGame");
+            players.SetScore(0, 100);
+            game.End();
+
+            StringAssert.Contains("\"gameName\":\"test-game\"", transport.ScorePayload);
+            StringAssert.DoesNotContain("NextGame", transport.ScorePayload);
+        }
+
+        [Test]
+        public void RestartAfterFinishedSessionUsesNewGameNameForScores()
+        {
+            players.ReplacePlayers(new[] { new FinkPlayer(0, "Player 1") });
+            game.Start();
+            players.SetScore(0, 100);
+            game.End();
+
+            settings.ConfigureGame("NextGame");
+            game.Restart();
+            players.SetScore(0, 200);
+            game.End();
+
+            StringAssert.Contains("\"gameName\":\"NextGame\"", transport.ScorePayload);
         }
 
         [Test]
