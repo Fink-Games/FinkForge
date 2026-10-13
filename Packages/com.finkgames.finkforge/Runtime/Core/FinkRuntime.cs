@@ -36,6 +36,7 @@ namespace FinkForge.Core
             _transport = new FinkHttpTransport(_environment);
             _finishOutbox = new FinishDeliveryOutbox(_transport);
             _settings = new FinkForgeSettingsService();
+            _environment.Resolve();
             Config = new ConfigService();
             Players = new PlayerService(() => _state.CurrentSession?.State ?? FinkSessionState.None,
                 () => Config.ScoreEnabled);
@@ -61,6 +62,8 @@ namespace FinkForge.Core
             {
                 await UniTask.SwitchToMainThread();
                 _environment.Resolve();
+                if (_environment.TryGetConfigurationError(out var configurationError))
+                    throw new InvalidOperationException(configurationError);
                 _transport.Prepare();
                 await _transport.LoadBootstrapDataAsync(Players, Config);
                 _inactivity.Start();
@@ -88,6 +91,14 @@ namespace FinkForge.Core
         {
             _settings.ConfigureGame(gameName);
         }
+
+        public bool LaunchIsConfigured => _environment.IsConfigured;
+        public string LaunchAccessToken => _environment.AccessToken;
+        public string LaunchInstallationId => _environment.InstallationId;
+        public string LaunchDeviceId => _environment.DeviceId;
+        public string LaunchNonce => _environment.LaunchNonce;
+        public string LaunchApiKey => _environment.ApiKey;
+        public string LaunchApiPort => _environment.ApiPort;
 
         private void OnLogMessage(string condition, string stackTrace, LogType type)
         {

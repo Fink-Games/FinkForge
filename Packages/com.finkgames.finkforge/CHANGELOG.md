@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Added Electron launch environment support for access token, installation ID, device ID, launch nonce, API key, and API port.
+- Added the public `Fink.Launch` diagnostics API and required request headers for the local Fink Forge server.
+- Initialization now fails clearly when the exported launch environment is incomplete; no mock context or default port is used.
+- Added authoritative context loading and Electron developer workflow documentation.
+
 ## 0.2.1
 
 - Fixed application shutdown waiting while the game is paused or `Time.timeScale` is zero.

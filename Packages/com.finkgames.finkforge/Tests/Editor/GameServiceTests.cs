@@ -311,8 +311,10 @@ namespace FinkForge.Tests
             public async UniTask<bool> SendAsync(PendingDelivery delivery)
             {
                 await UniTask.CompletedTask;
-                SendCount++;
-                LastDelivery = delivery;
+                if (delivery.Type != FinkDeliveryType.Heartbeat)
+                    SendCount++;
+                if (delivery.Type != FinkDeliveryType.Heartbeat)
+                    LastDelivery = delivery;
                 if (delivery.Type == FinkDeliveryType.IndividualScores || delivery.Type == FinkDeliveryType.TeamScores)
                 {
                     SawScoreDelivery = true;

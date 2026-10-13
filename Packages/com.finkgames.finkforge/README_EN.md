@@ -47,7 +47,7 @@ unity ./<Project-path>
 
 This command is supported by the Unity CLI on macOS, Windows, and Linux. Replace `./<Project-path>` with your Unity project folder.
 
-If Unity is opened from another terminal, Finder, or Unity Hub, the copied `FINK_API_PORT` and `FINK_API_KEY` values are not inherited by the Unity process. The settings are valid for one hour; after that, use `Copy Editor settings` again.
+If Unity is opened from another terminal, Finder, or Unity Hub, the exported launch environment values are not inherited by the Unity process. The settings are valid for one hour; after that, use `Copy Editor settings` again.
 
 ## 1. Public API overview
 
@@ -76,6 +76,13 @@ using FinkForge;
 | Read the music volume | `Fink.Config.MusicVolume` |
 | Read the SFX volume | `Fink.Config.SFXVolume` |
 | Read the language | `Fink.Config.Language` |
+| Check launch environment | `Fink.Launch.IsConfigured` |
+| Access token | `Fink.Launch.AccessToken` |
+| Installation ID | `Fink.Launch.InstallationId` |
+| Device ID | `Fink.Launch.DeviceId` |
+| Launch nonce | `Fink.Launch.LaunchNonce` |
+| API key | `Fink.Launch.ApiKey` |
+| API port | `Fink.Launch.ApiPort` |
 
 `Fink.App.End()` starts score delivery for the completed game. When delivery finishes, `Fink.App.OnScoresSent` is raised. Use `Fink.Application.Quit()` when Unity itself is closing.
 
@@ -97,14 +104,43 @@ Load config and the optional player roster
 Fink.App.Start() becomes available
 ```
 
-Runtime environment values are read from the process environment:
+The Fink Forge Electron application exports the launch environment through the process environment. Start the Unity Editor or Player build with these values:
 
 ```text
-FINK_API_PORT=3786
+FINK_ACCESS_TOKEN=<token>
+FINK_INSTALLATION_ID=<installation-id>
+FINK_DEVICE_ID=<device-id>
+FINK_LAUNCH_NONCE=<launch-nonce>
 FINK_API_KEY=<secret>
+FINK_API_PORT=<port>
 ```
 
-The development default port is `3786`. The API key is kept in the process environment and is not written to Unity assets, the public API, logs, or exception messages.
+All six values are required. The package does not create mock players, fake context, or a default port. If any value is missing, runtime initialization fails and context is not loaded.
+
+You can inspect launch values for diagnostics:
+
+```csharp
+bool ready = Fink.Launch.IsConfigured;
+string deviceId = Fink.Launch.DeviceId;
+string port = Fink.Launch.ApiPort;
+```
+
+The access token, API key, installation ID, device ID, and launch nonce are never serialized into Unity assets or printed in diagnostic logs.
+
+### Access-token verification
+
+FinkForge does not sign or verify access tokens; token verification belongs to the local Fink Forge server or a separate adapter. If needed, the verification side supplies the public verification key PEM, issuer, audience, purpose, algorithm, clock skew, and claim names separately. The private signing key must never be included in the Unity package or build.
+
+### External developer flow with Electron
+
+1. Open the Fink Forge Electron application.
+2. Create the context and player data.
+3. Export the launch environment values.
+4. Start Unity CLI with the same environment: `unity ./<Project-path>`.
+5. Run the game; `/v1/context` is the authoritative player and configuration source.
+6. Test the player context after `Fink.Players.OnPlayersReady`.
+7. Build the game.
+8. Upload the build to the main Electron system; no additional integration code is required because the package uses the same lifecycle and header contract.
 
 ### Context score contract
 

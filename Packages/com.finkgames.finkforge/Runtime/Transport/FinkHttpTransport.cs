@@ -84,7 +84,10 @@ namespace FinkForge.Transport
         private async UniTask<FinkResponse> SendRequestAsync(string method, string path, string json)
         {
             if (!environment.IsConfigured)
-                throw new FinkTransportException("Fink Table Runtime environment is not configured.", false);
+            {
+                environment.TryGetConfigurationError(out var configurationError);
+                throw new FinkTransportException("Fink Forge launch environment is not configured: " + configurationError, false);
+            }
 
             var url = environment.BaseUrl.TrimEnd('/') + path;
             using var request = new UnityWebRequest(url, method)
@@ -98,7 +101,7 @@ namespace FinkForge.Transport
                 request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
                 request.SetRequestHeader("Content-Type", "application/json");
             }
-            request.SetRequestHeader("X-API-Key", environment.ApiKey);
+            ApplyLaunchHeaders(request);
 
             try
             {
@@ -113,6 +116,15 @@ namespace FinkForge.Transport
             var body = request.downloadHandler?.text ?? string.Empty;
             var success = request.result == UnityWebRequest.Result.Success && status >= 200 && status < 300 && !HasExplicitFailure(body);
             return new FinkResponse(status, success, body, request.error);
+        }
+
+        private void ApplyLaunchHeaders(UnityWebRequest request)
+        {
+            request.SetRequestHeader("X-API-Key", environment.ApiKey);
+            request.SetRequestHeader("Authorization", "Bearer " + environment.AccessToken);
+            request.SetRequestHeader("X-Fink-Installation-Id", environment.InstallationId);
+            request.SetRequestHeader("X-Fink-Device-Id", environment.DeviceId);
+            request.SetRequestHeader("X-Fink-Launch-Nonce", environment.LaunchNonce);
         }
 
         private static bool HasExplicitFailure(string body)

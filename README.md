@@ -55,7 +55,7 @@ unity ./<Project-path>
 
 Bu komut macOS, Windows ve Linux'ta Unity CLI tarafından desteklenir. `./<Project-path>` yerine kendi Unity proje klasörünüzün yolunu yazın.
 
-Unity'yi farklı bir terminalden veya Finder/Unity Hub üzerinden açarsanız kopyalanan `FINK_API_PORT` ve `FINK_API_KEY` değerleri Unity process'ine aktarılmaz. Ayarlar bir saat geçerlidir; süre dolduğunda Fink Forge uygulamasından yeniden `Copy Editor settings` alın.
+Unity'yi farklı bir terminalden veya Finder/Unity Hub üzerinden açarsanız export edilen launch environment değerleri Unity process'ine aktarılmaz. Ayarlar bir saat geçerlidir; süre dolduğunda Fink Forge uygulamasından yeniden `Copy Editor settings` alın.
 
 ## 1. Public API özeti
 
@@ -83,6 +83,13 @@ using FinkForge;
 | Müzik ses seviyesi | `Fink.Config.MusicVolume` |
 | SFX ses seviyesi | `Fink.Config.SFXVolume` |
 | Dil | `Fink.Config.Language` |
+| Launch environment hazır mı | `Fink.Launch.IsConfigured` |
+| Access token | `Fink.Launch.AccessToken` |
+| Installation ID | `Fink.Launch.InstallationId` |
+| Device ID | `Fink.Launch.DeviceId` |
+| Launch nonce | `Fink.Launch.LaunchNonce` |
+| API key | `Fink.Launch.ApiKey` |
+| API port | `Fink.Launch.ApiPort` |
 
 `Fink.App.End()` skor gönderimini başlatan oyun bitişi çağrısıdır. Gönderim tamamlandığında `Fink.App.OnScoresSent` yayınlanır. Unity/process kapanışı için `Fink.Application.Quit()` kullanılır.
 
@@ -110,14 +117,43 @@ Fink.App.Start() kullanılabilir
 
 Session backend tarafından aktif edildiğinde `Fink.App.OnSessionStarted` bir kez yayınlanır. Bu event hem normal `Start()` hem de başarılı `Restart()` sonrasında kullanılır. `OnPlayersReady`, oyuncu roster'ının hazır olduğunu; `OnSessionStarted`, oyunun oynanabilir session'a geçtiğini belirtir.
 
-Runtime environment değerleri process environment üzerinden okunur:
+Fink Forge Electron uygulaması launch environment değerlerini process environment üzerinden export eder. Unity Editor veya Player build bu değerlerle başlatılmalıdır:
 
 ```text
-FINK_API_PORT=3786
+FINK_ACCESS_TOKEN=<token>
+FINK_INSTALLATION_ID=<installation-id>
+FINK_DEVICE_ID=<device-id>
+FINK_LAUNCH_NONCE=<launch-nonce>
 FINK_API_KEY=<secret>
+FINK_API_PORT=<port>
 ```
 
-Development default port `3786`'dır. API key hiçbir zaman Unity asset'ine, public API'ye, log'a veya exception mesajına yazılmaz.
+Altı değerin tamamı zorunludur. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksikse runtime initialization başarısız olur ve context yüklenmez.
+
+Launch değerlerini diagnostic amaçlı okuyabilirsiniz:
+
+```csharp
+bool ready = Fink.Launch.IsConfigured;
+string deviceId = Fink.Launch.DeviceId;
+string port = Fink.Launch.ApiPort;
+```
+
+Access token, API key, installation ID, device ID ve launch nonce Unity asset'lerine serialize edilmez; diagnostic loglarda secret değerler yazdırılmaz.
+
+### Access token doğrulama
+
+FinkForge access token imzalamaz veya doğrulamaz; token doğrulaması local Fink Forge server ya da ayrı bir adapter sorumluluğundadır. Gerekirse doğrulama tarafında public verification key PEM, issuer, audience, purpose, algorithm, clock skew ve claim isimleri ayrıca sağlanır. Private signing key Unity package'ına veya build'ine kesinlikle eklenmez.
+
+### Electron ile dış geliştirici akışı
+
+1. Fink Forge Electron uygulamasını açın.
+2. Context ve oyuncu bilgilerini oluşturun.
+3. Launch environment değerlerini export edin.
+4. Unity CLI'yi aynı environment ile başlatın: `unity ./<Project-path>`.
+5. Oyunu çalıştırın; `/v1/context` authoritative oyuncu ve config kaynağıdır.
+6. `Fink.Players.OnPlayersReady` sonrasında oyuncu context'ini test edin.
+7. Build alın.
+8. Build'i ana Electron sistemine yükleyin; package ek entegrasyon kodu gerektirmeden aynı lifecycle ve header sözleşmesiyle çalışır.
 
 ### Context score kontratı
 

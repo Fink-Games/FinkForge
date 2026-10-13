@@ -48,6 +48,17 @@ namespace FinkForge
             public static string Language => FinkRuntime.Instance.Config.Language;
         }
 
+        public static class Launch
+        {
+            public static bool IsConfigured => FinkRuntime.Instance.LaunchIsConfigured;
+            public static string AccessToken => FinkRuntime.Instance.LaunchAccessToken;
+            public static string InstallationId => FinkRuntime.Instance.LaunchInstallationId;
+            public static string DeviceId => FinkRuntime.Instance.LaunchDeviceId;
+            public static string LaunchNonce => FinkRuntime.Instance.LaunchNonce;
+            public static string ApiKey => FinkRuntime.Instance.LaunchApiKey;
+            public static string ApiPort => FinkRuntime.Instance.LaunchApiPort;
+        }
+
         public static class App
         {
             public static event Action<bool> OnScoresSent
