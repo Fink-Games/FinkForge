@@ -103,7 +103,7 @@ namespace FinkForge.Tests
 
             Assert.IsFalse(environment.IsConfigured);
             Assert.IsTrue(environment.TryGetConfigurationError(out var error));
-            StringAssert.Contains("access-token-public-key-runtime.bytes", error);
+            StringAssert.Contains("access-token-public-key.pem", error);
             StringAssert.DoesNotContain("not-a-pem", error);
         }
 
@@ -127,7 +127,7 @@ namespace FinkForge.Tests
 
             Assert.IsFalse(environment.IsConfigured);
             Assert.IsTrue(environment.TryGetConfigurationError(out var error));
-            StringAssert.Contains("access-token-public-key-runtime.bytes", error);
+            StringAssert.Contains("access-token-public-key.pem", error);
         }
 
         private const string ValidPublicKeyPem =

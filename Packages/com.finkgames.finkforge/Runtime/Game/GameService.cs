@@ -120,15 +120,13 @@ namespace FinkForge.Game
 
             lastRestartFrame = Time.frameCount;
             heartbeat.Stop();
-            var wasActive = current.State == FinkSessionState.Active;
             current.State = FinkSessionState.Finished;
             players.ClearScores();
             var nextSession = new FinkSession(settings.GameName);
             runtimeState.CurrentSession = nextSession;
-            if (wasActive)
-                EnqueueAppRestart(nextSession);
-            else
-                EnqueueAppStart(nextSession);
+            // Restarting from a finished session is still a runtime restart;
+            // SendScores must not turn the next restart into a fresh app start.
+            EnqueueAppRestart(nextSession);
         }
 
         public void Quit()

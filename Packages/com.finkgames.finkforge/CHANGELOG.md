@@ -9,7 +9,7 @@
 
 - Added runtime JWT decoding and RS256 signature validation before context initialization.
 - Added expiration, not-before, issuer, audience, purpose, installation, device, and nonce claim checks.
-- The trusted public key is loaded from the developer project at `Assets/Resources/FinkForge/access-token-public-key.pem`.
+- The trusted public key is loaded from the developer project at `Assets/FinkForge/Resources/access-token-public-key.pem` through the package's PEM importer.
 
 ## 0.4.0
 

@@ -234,7 +234,7 @@ namespace FinkForge.Tests
         }
 
         [Test]
-        public void RestartAfterScoresStartsNewSessionWithoutSendingScoresAgain()
+        public void RestartAfterScoresUsesRestartWithoutSendingScoresAgain()
         {
             players.ReplacePlayers(new[] { new FinkPlayer(0, "Player 1") });
             game.Start();
@@ -245,7 +245,8 @@ namespace FinkForge.Tests
 
             game.Restart();
 
-            Assert.AreEqual(FinkDeliveryType.AppStart, transport.LastDelivery.Type);
+            Assert.AreEqual(FinkDeliveryType.AppRestart, transport.LastDelivery.Type);
+            StringAssert.Contains("game_restart", transport.LastDelivery.PayloadJson);
             Assert.AreEqual(FinkSessionState.Active, state.CurrentSession.State);
         }
 
