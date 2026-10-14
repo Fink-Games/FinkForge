@@ -112,3 +112,7 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Local Fink Forge development configuration; may contain project-specific values.
+/Assets/FinkForge/Resources/FinkForgeConfig.asset
+/Assets/FinkForge/Resources/FinkForgeConfig.asset.meta
