@@ -1,6 +1,8 @@
 using System;
 using NUnit.Framework;
 using FinkForge.Environment;
+using FinkForge.Config;
+using UnityEngine;
 
 namespace FinkForge.Tests
 {
@@ -13,15 +15,11 @@ namespace FinkForge.Tests
             "FINK_DEVICE_ID",
             "FINK_LAUNCH_NONCE",
             "FINK_API_KEY",
-            "FINK_API_PORT",
-            "FINK_ACCESS_TOKEN_ISSUER",
-            "FINK_ACCESS_TOKEN_AUDIENCE",
-            "FINK_ACCESS_TOKEN_PURPOSE",
-            "FINK_ACCESS_TOKEN_ALGORITHM",
-            "FINK_ACCESS_TOKEN_CLOCK_SKEW"
+            "FINK_API_PORT"
         };
 
         private string[] previousValues;
+        private FinkForgeConfig config;
 
         [SetUp]
         public void SetUp()
@@ -34,7 +32,12 @@ namespace FinkForge.Tests
             }
 
             System.Environment.SetEnvironmentVariable("FINK_API_PORT", "3786");
-            System.Environment.SetEnvironmentVariable("FINK_ACCESS_TOKEN_CLOCK_SKEW", "30");
+            config = ScriptableObject.CreateInstance<FinkForgeConfig>();
+            SetConfigField("accessTokenIssuer", "test-issuer");
+            SetConfigField("accessTokenAudience", "test-audience");
+            SetConfigField("accessTokenPurpose", "test-purpose");
+            SetConfigField("accessTokenAlgorithm", "RS256");
+            SetConfigField("tokenClockSkewSeconds", 30);
         }
 
         [TearDown]
@@ -42,12 +45,13 @@ namespace FinkForge.Tests
         {
             for (var index = 0; index < Keys.Length; index++)
                 System.Environment.SetEnvironmentVariable(Keys[index], previousValues[index]);
+            UnityEngine.Object.DestroyImmediate(config);
         }
 
         [Test]
         public void ResolveReadsAllElectronLaunchValues()
         {
-            var environment = new FinkEnvironment(() => ValidPublicKeyPem);
+            var environment = new FinkEnvironment(() => ValidPublicKeyPem, config);
             environment.Resolve();
 
             Assert.IsTrue(environment.IsConfigured);
@@ -57,10 +61,10 @@ namespace FinkForge.Tests
             Assert.AreEqual("test-3", environment.LaunchNonce);
             Assert.AreEqual("test-4", environment.ApiKey);
             Assert.AreEqual("3786", environment.ApiPort);
-            Assert.AreEqual("test-6", environment.AccessTokenIssuer);
-            Assert.AreEqual("test-7", environment.AccessTokenAudience);
-            Assert.AreEqual("test-8", environment.AccessTokenPurpose);
-            Assert.AreEqual("test-9", environment.AccessTokenAlgorithm);
+            Assert.AreEqual("test-issuer", environment.AccessTokenIssuer);
+            Assert.AreEqual("test-audience", environment.AccessTokenAudience);
+            Assert.AreEqual("test-purpose", environment.AccessTokenPurpose);
+            Assert.AreEqual("RS256", environment.AccessTokenAlgorithm);
             Assert.AreEqual(30, environment.TokenClockSkewSeconds);
             StringAssert.Contains("BEGIN PUBLIC KEY", environment.AccessTokenPublicKeyPem);
             Assert.AreEqual("http://localhost:3786", environment.BaseUrl);
@@ -70,7 +74,7 @@ namespace FinkForge.Tests
         public void MissingLaunchValueMakesEnvironmentUnconfigured()
         {
             System.Environment.SetEnvironmentVariable("FINK_ACCESS_TOKEN", null);
-            var environment = new FinkEnvironment(() => ValidPublicKeyPem);
+            var environment = new FinkEnvironment(() => ValidPublicKeyPem, config);
             environment.Resolve();
 
             Assert.IsFalse(environment.IsConfigured);
@@ -82,7 +86,7 @@ namespace FinkForge.Tests
         public void InvalidPortDoesNotUseADevelopmentDefault()
         {
             System.Environment.SetEnvironmentVariable("FINK_API_PORT", "not-a-port");
-            var environment = new FinkEnvironment(() => ValidPublicKeyPem);
+            var environment = new FinkEnvironment(() => ValidPublicKeyPem, config);
             environment.Resolve();
 
             Assert.IsFalse(environment.IsConfigured);
@@ -94,7 +98,7 @@ namespace FinkForge.Tests
         [Test]
         public void InvalidPublicKeyMakesEnvironmentUnconfiguredWithoutLoggingTheValue()
         {
-            var environment = new FinkEnvironment(() => "not-a-pem");
+            var environment = new FinkEnvironment(() => "not-a-pem", config);
             environment.Resolve();
 
             Assert.IsFalse(environment.IsConfigured);
@@ -106,19 +110,19 @@ namespace FinkForge.Tests
         [Test]
         public void InvalidClockSkewMakesEnvironmentUnconfigured()
         {
-            System.Environment.SetEnvironmentVariable("FINK_ACCESS_TOKEN_CLOCK_SKEW", "not-a-number");
-            var environment = new FinkEnvironment(() => ValidPublicKeyPem);
+            SetConfigField("tokenClockSkewSeconds", -1);
+            var environment = new FinkEnvironment(() => ValidPublicKeyPem, config);
             environment.Resolve();
 
             Assert.IsFalse(environment.IsConfigured);
             Assert.IsTrue(environment.TryGetConfigurationError(out var error));
-            StringAssert.Contains("FINK_ACCESS_TOKEN_CLOCK_SKEW", error);
+            StringAssert.Contains("TokenClockSkewSeconds", error);
         }
 
         [Test]
         public void MissingProjectPublicKeyMakesEnvironmentUnconfigured()
         {
-            var environment = new FinkEnvironment(() => string.Empty);
+            var environment = new FinkEnvironment(() => string.Empty, config);
             environment.Resolve();
 
             Assert.IsFalse(environment.IsConfigured);
@@ -130,5 +134,10 @@ namespace FinkForge.Tests
             "-----BEGIN PUBLIC KEY-----\n" +
             "cHVibGljLWtleQ==\n" +
             "-----END PUBLIC KEY-----";
+
+        private void SetConfigField(string fieldName, object value)
+        {
+            typeof(FinkForgeConfig).GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(config, value);
+        }
     }
 }

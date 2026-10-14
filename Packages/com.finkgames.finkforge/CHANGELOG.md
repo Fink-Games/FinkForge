@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+- Moved JWT issuer, audience, purpose, algorithm, and clock-skew settings into `FinkForgeConfig`.
+- Electron environment is now limited to the six launch/session values.
+
 ## 0.5.0
 
 - Added runtime JWT decoding and RS256 signature validation before context initialization.

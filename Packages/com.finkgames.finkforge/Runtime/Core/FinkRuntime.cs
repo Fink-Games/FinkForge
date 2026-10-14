@@ -18,7 +18,7 @@ namespace FinkForge.Core
         public static FinkRuntime Instance => Lazy.Value;
 
         private readonly FinkRuntimeState _state = new FinkRuntimeState();
-        private readonly FinkEnvironment _environment = new FinkEnvironment();
+        private readonly FinkEnvironment _environment;
         private readonly FinkHttpTransport _transport;
         private readonly LaunchSecurityService _launchSecurity;
         private readonly FinishDeliveryOutbox _finishOutbox;
@@ -34,11 +34,11 @@ namespace FinkForge.Core
 
         private FinkRuntime()
         {
+            _settings = new FinkForgeSettingsService();
+            _environment = new FinkEnvironment(null, _settings.Config);
             _transport = new FinkHttpTransport(_environment);
             _launchSecurity = new LaunchSecurityService();
             _finishOutbox = new FinishDeliveryOutbox(_transport);
-            _settings = new FinkForgeSettingsService();
-            _environment.Resolve();
             Config = new ConfigService();
             Players = new PlayerService(() => _state.CurrentSession?.State ?? FinkSessionState.None,
                 () => Config.ScoreEnabled);

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using FinkForge.Config;
 
 namespace FinkForge.Environment
 {
@@ -12,11 +13,6 @@ namespace FinkForge.Environment
         private const string LaunchNonceKey = "FINK_LAUNCH_NONCE";
         private const string ApiPortKey = "FINK_API_PORT";
         private const string ApiKeyKey = "FINK_API_KEY";
-        private const string IssuerKey = "FINK_ACCESS_TOKEN_ISSUER";
-        private const string AudienceKey = "FINK_ACCESS_TOKEN_AUDIENCE";
-        private const string PurposeKey = "FINK_ACCESS_TOKEN_PURPOSE";
-        private const string AlgorithmKey = "FINK_ACCESS_TOKEN_ALGORITHM";
-        private const string ClockSkewKey = "FINK_ACCESS_TOKEN_CLOCK_SKEW";
 
         public string BaseUrl { get; private set; }
         public string AccessToken { get; private set; }
@@ -35,9 +31,12 @@ namespace FinkForge.Environment
 
         private readonly Func<string> publicKeyLoader;
 
-        public FinkEnvironment(Func<string> publicKeyLoader = null)
+        private readonly FinkForgeConfig config;
+
+        public FinkEnvironment(Func<string> publicKeyLoader = null, FinkForgeConfig config = null)
         {
             this.publicKeyLoader = publicKeyLoader;
+            this.config = config;
         }
         internal bool IsConfigured => TryGetConfigurationError(out _) == false;
 
@@ -49,13 +48,12 @@ namespace FinkForge.Environment
             LaunchNonce = System.Environment.GetEnvironmentVariable(LaunchNonceKey);
             ApiKey = System.Environment.GetEnvironmentVariable(ApiKeyKey);
             ApiPort = System.Environment.GetEnvironmentVariable(ApiPortKey);
-            AccessTokenIssuer = System.Environment.GetEnvironmentVariable(IssuerKey);
-            AccessTokenAudience = System.Environment.GetEnvironmentVariable(AudienceKey);
-            AccessTokenPurpose = System.Environment.GetEnvironmentVariable(PurposeKey);
-            AccessTokenAlgorithm = System.Environment.GetEnvironmentVariable(AlgorithmKey);
-            var clockSkew = System.Environment.GetEnvironmentVariable(ClockSkewKey);
-            TokenClockSkewSeconds = int.TryParse(clockSkew, out var parsedClockSkew) && parsedClockSkew >= 0
-                ? parsedClockSkew
+            AccessTokenIssuer = config?.AccessTokenIssuer;
+            AccessTokenAudience = config?.AccessTokenAudience;
+            AccessTokenPurpose = config?.AccessTokenPurpose;
+            AccessTokenAlgorithm = config?.AccessTokenAlgorithm;
+            TokenClockSkewSeconds = config != null && config.TokenClockSkewSeconds >= 0
+                ? config.TokenClockSkewSeconds
                 : -1;
             AccessTokenPublicKeyPem = LoadPublicKeyPem();
             AccessTokenPublicKeyB64 = ExtractPublicKeyBase64(AccessTokenPublicKeyPem);
@@ -108,31 +106,31 @@ namespace FinkForge.Environment
 
             if (string.IsNullOrWhiteSpace(AccessTokenIssuer))
             {
-                error = "FINK_ACCESS_TOKEN_ISSUER is missing.";
+                error = "FinkForgeConfig AccessTokenIssuer is missing.";
                 return true;
             }
 
             if (string.IsNullOrWhiteSpace(AccessTokenAudience))
             {
-                error = "FINK_ACCESS_TOKEN_AUDIENCE is missing.";
+                error = "FinkForgeConfig AccessTokenAudience is missing.";
                 return true;
             }
 
             if (string.IsNullOrWhiteSpace(AccessTokenPurpose))
             {
-                error = "FINK_ACCESS_TOKEN_PURPOSE is missing.";
+                error = "FinkForgeConfig AccessTokenPurpose is missing.";
                 return true;
             }
 
             if (string.IsNullOrWhiteSpace(AccessTokenAlgorithm))
             {
-                error = "FINK_ACCESS_TOKEN_ALGORITHM is missing.";
+                error = "FinkForgeConfig AccessTokenAlgorithm is missing.";
                 return true;
             }
 
             if (TokenClockSkewSeconds < 0)
             {
-                error = "FINK_ACCESS_TOKEN_CLOCK_SKEW is missing or invalid.";
+                error = "FinkForgeConfig TokenClockSkewSeconds is missing or invalid.";
                 return true;
             }
 
