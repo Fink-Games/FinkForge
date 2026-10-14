@@ -6,7 +6,7 @@ namespace FinkForge.Environment
 {
     internal sealed class FinkEnvironment
     {
-        private const string PublicKeyResourcePath = "FinkForge/access-token-public-key";
+        private const string PublicKeyResourcePath = "access-token-public-key";
         private const string AccessTokenKey = "FINK_ACCESS_TOKEN";
         private const string InstallationIdKey = "FINK_INSTALLATION_ID";
         private const string DeviceIdKey = "FINK_DEVICE_ID";
@@ -100,7 +100,7 @@ namespace FinkForge.Environment
 
             if (string.IsNullOrWhiteSpace(AccessTokenPublicKeyB64) || string.IsNullOrWhiteSpace(AccessTokenPublicKeyPem) || !IsValidPublicKeyBase64(AccessTokenPublicKeyB64))
             {
-                error = "Assets/Resources/FinkForge/access-token-public-key.pem is missing or invalid.";
+                error = "Assets/FinkForge/Resources/access-token-public-key.pem is missing or invalid.";
                 return true;
             }
 

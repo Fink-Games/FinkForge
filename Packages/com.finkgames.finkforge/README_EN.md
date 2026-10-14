@@ -121,7 +121,7 @@ FINK_API_KEY=<secret>
 FINK_API_PORT=<port>
 ```
 
-The six launch values come from the Electron environment. Issuer, audience, purpose, algorithm, and clock skew are edited in the `FinkForgeConfig` ScriptableObject. The developer also adds `Assets/Resources/FinkForge/access-token-public-key.pem` to the project. The package does not create mock players, fake context, or a default port. If a value is missing, public.pem is unavailable, or clock skew is invalid, runtime initialization fails and context is not loaded.
+The six launch values come from the Electron environment. Issuer, audience, purpose, algorithm, and clock skew are edited in the `FinkForgeConfig` ScriptableObject. The developer also adds `Assets/FinkForge/Resources/access-token-public-key.pem` to the project. The package does not create mock players, fake context, or a default port. If a value is missing, public.pem is unavailable, or clock skew is invalid, runtime initialization fails and context is not loaded.
 
 You can inspect launch values for diagnostics:
 
