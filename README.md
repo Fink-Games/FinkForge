@@ -134,7 +134,7 @@ FINK_API_KEY=<secret>
 FINK_API_PORT=<port>
 ```
 
-Altı launch değeri Electron environment'ından gelir. Issuer, audience, purpose, algorithm ve clock skew `FinkForgeConfig` ScriptableObject'inden düzenlenir. Developer ayrıca `Assets/FinkForge/Resources/access-token-public-key.pem` dosyasını projeye ekler. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksik, public.pem bulunamaz ya da clock skew geçersizse runtime initialization başarısız olur ve context yüklenmez.
+Altı launch değeri Electron environment'ından gelir. Issuer, audience, purpose, algorithm ve clock skew `FinkForgeConfig` ScriptableObject'inden düzenlenir. Developer public key içeriğini `Assets/FinkForge/Resources/access-token-public-key-runtime.bytes` dosyasına ekler. Bu dosyanın içeriği PEM formatındadır. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksik, public key bulunamaz ya da clock skew geçersizse runtime initialization başarısız olur ve context yüklenmez.
 
 Launch değerlerini diagnostic amaçlı okuyabilirsiniz:
 

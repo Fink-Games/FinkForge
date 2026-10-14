@@ -116,6 +116,9 @@ namespace FinkForge.Core
             if (type != LogType.Error && type != LogType.Exception && type != LogType.Assert)
                 return;
 
+            if (!string.IsNullOrEmpty(condition) && condition.StartsWith("[Fink Forge]", StringComparison.Ordinal))
+                return;
+
             var reasonType = type == LogType.Exception ? "crash" : "error";
             Device.ReportAutomaticIncident(reasonType, condition, stackTrace);
         }
