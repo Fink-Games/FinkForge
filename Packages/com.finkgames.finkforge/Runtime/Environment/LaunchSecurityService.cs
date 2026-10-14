@@ -70,16 +70,18 @@ namespace FinkForge.Environment
                     return false;
                 }
 
-                if (!ClaimEquals(payload.iss, environment.AccessTokenIssuer) ||
-                    !ClaimEquals(payload.aud, environment.AccessTokenAudience) ||
-                    !ClaimEquals(payload.purpose, environment.AccessTokenPurpose) ||
-                    !ClaimEquals(payload.installation, environment.InstallationId) ||
-                    !ClaimEquals(payload.device, environment.DeviceId) ||
-                    !ClaimEquals(payload.nonce, environment.LaunchNonce))
-                {
-                    error = "Access token claims do not match the launch environment.";
-                    return false;
-                }
+                if (!ClaimEquals(payload.iss, environment.AccessTokenIssuer))
+                    return FailClaim("issuer", out error);
+                if (!ClaimEquals(payload.aud, environment.AccessTokenAudience))
+                    return FailClaim("audience", out error);
+                if (!ClaimEquals(payload.purpose, environment.AccessTokenPurpose))
+                    return FailClaim("purpose", out error);
+                if (!ClaimEqualsAny(payload.installation, payload.installation_id, environment.InstallationId))
+                    return FailClaim("installation", out error);
+                if (!ClaimEqualsAny(payload.device, payload.device_id, environment.DeviceId))
+                    return FailClaim("device", out error);
+                if (!ClaimEquals(payload.nonce, environment.LaunchNonce))
+                    return FailClaim("nonce", out error);
 
                 error = string.Empty;
                 return true;
@@ -95,6 +97,17 @@ namespace FinkForge.Environment
         {
             return !string.IsNullOrWhiteSpace(actual) && !string.IsNullOrWhiteSpace(expected) &&
                    string.Equals(actual, expected, StringComparison.Ordinal);
+        }
+
+        private static bool ClaimEqualsAny(string first, string second, string expected)
+        {
+            return ClaimEquals(first, expected) || ClaimEquals(second, expected);
+        }
+
+        private static bool FailClaim(string claimName, out string error)
+        {
+            error = "Access token " + claimName + " claim does not match the launch environment.";
+            return false;
         }
 
         private static bool HasJsonProperty(string json, string propertyName)
@@ -217,7 +230,9 @@ namespace FinkForge.Environment
             public long nbf;
             public string purpose;
             public string installation;
+            public string installation_id;
             public string device;
+            public string device_id;
             public string nonce;
         }
 
