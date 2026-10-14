@@ -20,6 +20,7 @@ namespace FinkForge.Core
         private readonly FinkRuntimeState _state = new FinkRuntimeState();
         private readonly FinkEnvironment _environment = new FinkEnvironment();
         private readonly FinkHttpTransport _transport;
+        private readonly LaunchSecurityService _launchSecurity;
         private readonly FinishDeliveryOutbox _finishOutbox;
         private readonly FinkForgeSettingsService _settings;
 
@@ -34,6 +35,7 @@ namespace FinkForge.Core
         private FinkRuntime()
         {
             _transport = new FinkHttpTransport(_environment);
+            _launchSecurity = new LaunchSecurityService();
             _finishOutbox = new FinishDeliveryOutbox(_transport);
             _settings = new FinkForgeSettingsService();
             _environment.Resolve();
@@ -64,6 +66,8 @@ namespace FinkForge.Core
                 _environment.Resolve();
                 if (_environment.TryGetConfigurationError(out var configurationError))
                     throw new InvalidOperationException(configurationError);
+                if (!_launchSecurity.Validate(_environment, out var tokenError))
+                    throw new InvalidOperationException(tokenError);
                 _transport.Prepare();
                 await _transport.LoadBootstrapDataAsync(Players, Config);
                 _inactivity.Start();

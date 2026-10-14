@@ -153,7 +153,7 @@ Access token, API key, installation ID, device ID ve launch nonce Unity asset'le
 
 ### Access token doğrulama
 
-FinkForge access token imzalamaz veya doğrulamaz; token doğrulaması local Fink Forge server ya da ayrı bir adapter sorumluluğundadır. Gerekirse doğrulama tarafında public verification key PEM, issuer, audience, purpose, algorithm, clock skew ve claim isimleri ayrıca sağlanır. Private signing key Unity package'ına veya build'ine kesinlikle eklenmez.
+FinkForge JWT access token'ı context çağrısından önce runtime'da doğrular: RS256 imzası, `exp`, `nbf`, issuer, audience, purpose, installation, device ve nonce claim'leri kontrol edilir. Local server tarafındaki doğrulama yine korunur. Private signing key Unity package'ına veya build'ine kesinlikle eklenmez.
 
 ### Electron ile dış geliştirici akışı
 

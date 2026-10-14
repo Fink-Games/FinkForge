@@ -104,7 +104,7 @@ namespace FinkForge.Editor
             if (string.IsNullOrWhiteSpace(gameName))
                 Debug.LogError("[Fink Forge] Game Name is missing.");
             if (trustedKeys)
-                Debug.LogWarning("[Fink Forge] Launch trusted-key validation is not configured; no fake JWT validation is enabled.");
+                Debug.Log("[Fink Forge] Launch JWT validation is enabled. The runtime public key is loaded from the project public.pem.");
         }
 
         private static bool HasUniTask() => Type.GetType("Cysharp.Threading.Tasks.UniTask, UniTask") != null;

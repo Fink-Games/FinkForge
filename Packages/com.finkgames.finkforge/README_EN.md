@@ -140,7 +140,7 @@ The access token, API key, installation ID, device ID, and launch nonce are neve
 
 ### Access-token verification
 
-FinkForge does not sign or verify access tokens; token verification belongs to the local Fink Forge server or a separate adapter. If needed, the verification side supplies the public verification key PEM, issuer, audience, purpose, algorithm, clock skew, and claim names separately. The private signing key must never be included in the Unity package or build.
+FinkForge validates the JWT access token before requesting context: it checks the RS256 signature, `exp`, `nbf`, issuer, audience, purpose, installation, device, and nonce claims. Server-side validation remains in place as the final authority. The private signing key must never be included in the Unity package or build.
 
 ### External developer flow with Electron
 
