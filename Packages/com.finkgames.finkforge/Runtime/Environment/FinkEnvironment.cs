@@ -1,14 +1,17 @@
+using System;
+using UnityEngine;
+
 namespace FinkForge.Environment
 {
     internal sealed class FinkEnvironment
     {
+        private const string PublicKeyResourcePath = "FinkForge/access-token-public-key";
         private const string AccessTokenKey = "FINK_ACCESS_TOKEN";
         private const string InstallationIdKey = "FINK_INSTALLATION_ID";
         private const string DeviceIdKey = "FINK_DEVICE_ID";
         private const string LaunchNonceKey = "FINK_LAUNCH_NONCE";
         private const string ApiPortKey = "FINK_API_PORT";
         private const string ApiKeyKey = "FINK_API_KEY";
-        private const string PublicKeyB64Key = "FINK_ACCESS_TOKEN_PUBLIC_KEY_B64";
         private const string IssuerKey = "FINK_ACCESS_TOKEN_ISSUER";
         private const string AudienceKey = "FINK_ACCESS_TOKEN_AUDIENCE";
         private const string PurposeKey = "FINK_ACCESS_TOKEN_PURPOSE";
@@ -29,6 +32,13 @@ namespace FinkForge.Environment
         public string AccessTokenAlgorithm { get; private set; }
         public int TokenClockSkewSeconds { get; private set; }
         public string AccessTokenPublicKeyPem { get; private set; }
+
+        private readonly Func<string> publicKeyLoader;
+
+        public FinkEnvironment(Func<string> publicKeyLoader = null)
+        {
+            this.publicKeyLoader = publicKeyLoader;
+        }
         internal bool IsConfigured => TryGetConfigurationError(out _) == false;
 
         public void Resolve()
@@ -39,7 +49,6 @@ namespace FinkForge.Environment
             LaunchNonce = System.Environment.GetEnvironmentVariable(LaunchNonceKey);
             ApiKey = System.Environment.GetEnvironmentVariable(ApiKeyKey);
             ApiPort = System.Environment.GetEnvironmentVariable(ApiPortKey);
-            AccessTokenPublicKeyB64 = System.Environment.GetEnvironmentVariable(PublicKeyB64Key);
             AccessTokenIssuer = System.Environment.GetEnvironmentVariable(IssuerKey);
             AccessTokenAudience = System.Environment.GetEnvironmentVariable(AudienceKey);
             AccessTokenPurpose = System.Environment.GetEnvironmentVariable(PurposeKey);
@@ -48,7 +57,8 @@ namespace FinkForge.Environment
             TokenClockSkewSeconds = int.TryParse(clockSkew, out var parsedClockSkew) && parsedClockSkew >= 0
                 ? parsedClockSkew
                 : -1;
-            AccessTokenPublicKeyPem = TryConvertPublicKeyToPem(AccessTokenPublicKeyB64);
+            AccessTokenPublicKeyPem = LoadPublicKeyPem();
+            AccessTokenPublicKeyB64 = ExtractPublicKeyBase64(AccessTokenPublicKeyPem);
             BaseUrl = BuildBaseUrl(ApiPort);
         }
 
@@ -90,9 +100,9 @@ namespace FinkForge.Environment
                 return true;
             }
 
-            if (string.IsNullOrWhiteSpace(AccessTokenPublicKeyB64) || string.IsNullOrWhiteSpace(AccessTokenPublicKeyPem))
+            if (string.IsNullOrWhiteSpace(AccessTokenPublicKeyB64) || string.IsNullOrWhiteSpace(AccessTokenPublicKeyPem) || !IsValidPublicKeyBase64(AccessTokenPublicKeyB64))
             {
-                error = "FINK_ACCESS_TOKEN_PUBLIC_KEY_B64 is missing or invalid.";
+                error = "Assets/Resources/FinkForge/access-token-public-key.pem is missing or invalid.";
                 return true;
             }
 
@@ -130,29 +140,37 @@ namespace FinkForge.Environment
             return false;
         }
 
-        private static string TryConvertPublicKeyToPem(string encodedKey)
+        private string LoadPublicKeyPem()
         {
-            if (string.IsNullOrWhiteSpace(encodedKey)) return string.Empty;
+            var pem = publicKeyLoader != null
+                ? publicKeyLoader()
+                : Resources.Load<TextAsset>(PublicKeyResourcePath)?.text;
+            return string.IsNullOrWhiteSpace(pem) ? string.Empty : pem.Trim();
+        }
 
+        private static string ExtractPublicKeyBase64(string pem)
+        {
+            if (string.IsNullOrWhiteSpace(pem)) return string.Empty;
+            return pem
+                .Replace("-----BEGIN PUBLIC KEY-----", string.Empty)
+                .Replace("-----END PUBLIC KEY-----", string.Empty)
+                .Replace("-----BEGIN RSA PUBLIC KEY-----", string.Empty)
+                .Replace("-----END RSA PUBLIC KEY-----", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace(" ", string.Empty)
+                .Trim();
+        }
+
+        private static bool IsValidPublicKeyBase64(string encodedKey)
+        {
             try
             {
-                var keyBytes = System.Convert.FromBase64String(encodedKey);
-                if (keyBytes.Length == 0) return string.Empty;
-
-                var decodedText = System.Text.Encoding.UTF8.GetString(keyBytes).Trim();
-                if (decodedText.Contains("-----BEGIN")) return decodedText;
-
-                var derBase64 = System.Convert.ToBase64String(keyBytes);
-                var lines = new System.Text.StringBuilder();
-                lines.AppendLine("-----BEGIN PUBLIC KEY-----");
-                for (var index = 0; index < derBase64.Length; index += 64)
-                    lines.AppendLine(derBase64.Substring(index, System.Math.Min(64, derBase64.Length - index)));
-                lines.Append("-----END PUBLIC KEY-----");
-                return lines.ToString();
+                return Convert.FromBase64String(encodedKey).Length > 0;
             }
-            catch (System.FormatException)
+            catch (FormatException)
             {
-                return string.Empty;
+                return false;
             }
         }
 

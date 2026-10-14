@@ -119,7 +119,6 @@ FINK_DEVICE_ID=<device-id>
 FINK_LAUNCH_NONCE=<launch-nonce>
 FINK_API_KEY=<secret>
 FINK_API_PORT=<port>
-FINK_ACCESS_TOKEN_PUBLIC_KEY_B64=<base64-public-key>
 FINK_ACCESS_TOKEN_ISSUER=<issuer>
 FINK_ACCESS_TOKEN_AUDIENCE=<audience>
 FINK_ACCESS_TOKEN_PURPOSE=<purpose>
@@ -127,7 +126,7 @@ FINK_ACCESS_TOKEN_ALGORITHM=<algorithm>
 FINK_ACCESS_TOKEN_CLOCK_SKEW=<seconds>
 ```
 
-All twelve values are required. The public key is read as base64 and can be converted to PEM when needed. The package does not create mock players, fake context, or a default port. If a value is missing or clock skew is invalid, runtime initialization fails and context is not loaded.
+The eleven values other than the public key come from the Electron environment. The developer also adds `Assets/Resources/FinkForge/access-token-public-key.pem` to the project. The package does not create mock players, fake context, or a default port. If a value is missing, public.pem is unavailable, or clock skew is invalid, runtime initialization fails and context is not loaded.
 
 You can inspect launch values for diagnostics:
 
@@ -137,7 +136,7 @@ string deviceId = Fink.Launch.DeviceId;
 string port = Fink.Launch.ApiPort;
 ```
 
-The access token, API key, installation ID, device ID, launch nonce, and public key are never serialized into Unity assets or printed in diagnostic logs.
+The access token, API key, installation ID, device ID, and launch nonce are never serialized into Unity assets. The public key is not secret and is read from the developer's `public.pem`; secrets and personal launch values are not printed in diagnostic logs.
 
 ### Access-token verification
 

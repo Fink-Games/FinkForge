@@ -132,7 +132,6 @@ FINK_DEVICE_ID=<device-id>
 FINK_LAUNCH_NONCE=<launch-nonce>
 FINK_API_KEY=<secret>
 FINK_API_PORT=<port>
-FINK_ACCESS_TOKEN_PUBLIC_KEY_B64=<base64-public-key>
 FINK_ACCESS_TOKEN_ISSUER=<issuer>
 FINK_ACCESS_TOKEN_AUDIENCE=<audience>
 FINK_ACCESS_TOKEN_PURPOSE=<purpose>
@@ -140,7 +139,7 @@ FINK_ACCESS_TOKEN_ALGORITHM=<algorithm>
 FINK_ACCESS_TOKEN_CLOCK_SKEW=<seconds>
 ```
 
-On iki değerin tamamı zorunludur. Public key base64 olarak okunur ve gerektiğinde PEM formatına dönüştürülür. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksik ya da clock skew geçersizse runtime initialization başarısız olur ve context yüklenmez.
+Public key dışındaki on bir değer Electron environment'ından gelir. Developer ayrıca `Assets/Resources/FinkForge/access-token-public-key.pem` dosyasını projeye ekler. Package mock oyuncu, sahte context veya default port üretmez. Bir değer eksik, public.pem bulunamaz ya da clock skew geçersizse runtime initialization başarısız olur ve context yüklenmez.
 
 Launch değerlerini diagnostic amaçlı okuyabilirsiniz:
 
@@ -150,7 +149,7 @@ string deviceId = Fink.Launch.DeviceId;
 string port = Fink.Launch.ApiPort;
 ```
 
-Access token, API key, installation ID, device ID, launch nonce ve public key Unity asset'lerine serialize edilmez; diagnostic loglarda secret veya kişisel launch değerleri yazdırılmaz.
+Access token, API key, installation ID, device ID ve launch nonce Unity asset'lerine serialize edilmez. Public key zaten secret değildir ve developer projesindeki `public.pem` dosyasından okunur; diagnostic loglarda secret veya kişisel launch değerleri yazdırılmaz.
 
 ### Access token doğrulama
 
