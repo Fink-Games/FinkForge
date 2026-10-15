@@ -1,5 +1,3 @@
-using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace FinkForge.Application
@@ -15,14 +13,6 @@ namespace FinkForge.Application
             if (quitting) return;
             quitting = true;
             onBeforeQuit?.Invoke();
-            ShutdownAsync().Forget();
-        }
-
-        private async UniTaskVoid ShutdownAsync()
-        {
-            // Give the score/end outbox a bounded window to complete its first request.
-            // Quit must complete even when the game is paused or timeScale is zero.
-            await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: true);
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else

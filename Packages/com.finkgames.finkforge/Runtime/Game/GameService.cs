@@ -244,6 +244,7 @@ namespace FinkForge.Game
                     teams = System.Array.ConvertAll(teams, team => new TeamScoreEntry
                     {
                         teamId = team.TeamId,
+                        teamName = team.TeamName,
                         score = team.Score
                     })
                 };

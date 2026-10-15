@@ -124,6 +124,7 @@ namespace FinkForge.Transport
     internal sealed class TeamScoreEntry
     {
         public int teamId;
+        public string teamName;
         public int score;
     }
 

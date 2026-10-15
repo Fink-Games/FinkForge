@@ -296,6 +296,7 @@ namespace FinkForge.Tests
 
             Assert.AreEqual(FinkDeliveryType.TeamScores, transport.LastDelivery.Type);
             StringAssert.Contains("\"teamId\":1", transport.LastDelivery.PayloadJson);
+            StringAssert.Contains("\"teamName\":\"TakımB\"", transport.LastDelivery.PayloadJson);
             StringAssert.Contains("\"score\":150", transport.LastDelivery.PayloadJson);
         }
 

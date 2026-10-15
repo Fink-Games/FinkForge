@@ -615,7 +615,7 @@ Takım score payload'ı:
   "gameName": "sumo",
   "playerCount": 4,
   "teams": [
-    { "teamId": 1, "score": 200 }
+    { "teamId": 1, "teamName": "Kırmızı", "score": 200 }
   ]
 }
 ```

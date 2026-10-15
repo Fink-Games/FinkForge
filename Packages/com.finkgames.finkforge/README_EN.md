@@ -569,7 +569,7 @@ Team score payload:
   "gameName": "sumo",
   "playerCount": 4,
   "teams": [
-    { "teamId": 1, "score": 200 }
+    { "teamId": 1, "teamName": "Red", "score": 200 }
   ]
 }
 ```

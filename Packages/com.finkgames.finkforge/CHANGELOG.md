@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+- Removed the fixed three-second delay from application shutdown. Editor Play Mode and Player builds now quit immediately after the end flow is requested.
+
 ## 0.6.0
 
 - Moved JWT issuer, audience, purpose, algorithm, and clock-skew settings into `FinkForgeConfig`.

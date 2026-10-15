@@ -69,7 +69,10 @@ namespace FinkForge.Players
                 })
                 .Where(entry => entry.Player != null && entry.Player.TeamId.HasValue)
                 .GroupBy(entry => entry.Player.TeamId.Value)
-                .Select(team => new TeamScoreSnapshot(team.Key, team.Sum(entry => entry.Score.Value)))
+                .Select(team => new TeamScoreSnapshot(
+                    team.Key,
+                    team.Select(entry => entry.Player.Nickname).FirstOrDefault() ?? string.Empty,
+                    team.Sum(entry => entry.Score.Value)))
                 .ToArray();
         }
 
@@ -116,11 +119,13 @@ namespace FinkForge.Players
     internal readonly struct TeamScoreSnapshot
     {
         public readonly int TeamId;
+        public readonly string TeamName;
         public readonly int Score;
 
-        public TeamScoreSnapshot(int teamId, int score)
+        public TeamScoreSnapshot(int teamId, string teamName, int score)
         {
             TeamId = teamId;
+            TeamName = teamName;
             Score = score;
         }
     }
