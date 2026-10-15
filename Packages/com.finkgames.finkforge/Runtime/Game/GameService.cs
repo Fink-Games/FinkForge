@@ -83,7 +83,6 @@ namespace FinkForge.Game
             }
 
             session.State = FinkSessionState.Finishing;
-            heartbeat.Stop();
             var hasScores = players.ScoresTouched;
             var scoreDelivery = CreateScoreDelivery(session, success => CompleteScoreSend(session, success));
             if (scoreDelivery == null)

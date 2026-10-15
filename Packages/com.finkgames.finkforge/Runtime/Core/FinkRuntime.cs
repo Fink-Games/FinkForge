@@ -44,7 +44,9 @@ namespace FinkForge.Core
                 () => Config.ScoreEnabled);
             _heartbeat = new HeartbeatService(_transport);
             App = new GameService(Players, Config, _finishOutbox, _heartbeat, _state, _settings);
-            _inactivity = new InactivityService(Config);
+            _inactivity = new InactivityService(Config,
+                () => _state.CurrentSession != null && _state.CurrentSession.State == FinkSessionState.Active);
+            _inactivity.TimedOut += RequestQuit;
             _application = new ApplicationService(App.Quit);
             Device = new DeviceService(_finishOutbox, RequestQuit);
             Players.AllPlayersLeft += RequestQuit;
@@ -90,6 +92,24 @@ namespace FinkForge.Core
         }
 
         public void RequestQuit() => _application.Quit();
+
+        public bool InactivityWarningActive => _inactivity.IsWarningActive;
+        public float InactivityWarningRemainingSeconds => _inactivity.WarningRemainingSeconds;
+        public event Action<float> InactivityWarningStarted
+        {
+            add => _inactivity.WarningStarted += value;
+            remove => _inactivity.WarningStarted -= value;
+        }
+        public event Action<float> InactivityWarningUpdated
+        {
+            add => _inactivity.WarningUpdated += value;
+            remove => _inactivity.WarningUpdated -= value;
+        }
+        public event Action InactivityWarningCancelled
+        {
+            add => _inactivity.WarningCancelled += value;
+            remove => _inactivity.WarningCancelled -= value;
+        }
 
         public void ConfigureGame(string gameName)
         {

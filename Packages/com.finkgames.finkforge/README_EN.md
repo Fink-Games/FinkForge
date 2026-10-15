@@ -194,6 +194,24 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 This value is independent of `scoreEnabled`; a scoreless game can still use teams.
 
+### Inactivity warning and automatic shutdown
+
+When no input is received for `inactivityTimeoutSeconds`, the inactivity warning starts. If no input arrives during `inactivityQuitCountdownSeconds`, Fink Forge runs the score/end flow and quits the application. Any touch or other supported input cancels the countdown.
+
+The game can show its own warning UI:
+
+```csharp
+Fink.Inactivity.OnWarningStarted += ShowInactivityWarning;
+Fink.Inactivity.OnWarningUpdated += UpdateInactivityCountdown;
+Fink.Inactivity.OnWarningCancelled += HideInactivityWarning;
+
+void ShowInactivityWarning(float seconds) { /* Show "Touch the screen" UI */ }
+void UpdateInactivityCountdown(float seconds) { /* Update countdown text */ }
+void HideInactivityWarning() { /* Hide UI */ }
+```
+
+The UI can also read `Fink.Inactivity.IsWarningActive` and `Fink.Inactivity.WarningRemainingSeconds`.
+
 ### Creating the game configuration
 
 Create the game configuration through the Unity menu:

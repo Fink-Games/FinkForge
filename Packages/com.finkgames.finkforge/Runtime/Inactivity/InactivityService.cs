@@ -9,27 +9,80 @@ namespace FinkForge.Inactivity
     internal sealed class InactivityService
     {
         private readonly ConfigService config;
+        private readonly System.Func<bool> sessionActive;
         private float lastInputTime;
         private bool started;
+        private bool warningActive;
+        private float warningStartedAt;
         private bool hasPointerPosition;
         private Vector2 lastPointerPosition;
         private const float PointerMovementThreshold = 0.25f;
         private const float ScrollThreshold = 0.01f;
         public event System.Action TimedOut;
-        public InactivityService(ConfigService config) { this.config = config; }
+        public event System.Action<float> WarningStarted;
+        public event System.Action<float> WarningUpdated;
+        public event System.Action WarningCancelled;
+        public InactivityService(ConfigService config, System.Func<bool> sessionActive)
+        {
+            this.config = config;
+            this.sessionActive = sessionActive;
+        }
 
         public void Start() { started = true; lastInputTime = Time.realtimeSinceStartup; }
+
+        public bool IsWarningActive => warningActive;
+
+        public float WarningRemainingSeconds
+        {
+            get
+            {
+                if (!warningActive) return 0f;
+                return Mathf.Max(0f, config.InactivityQuitCountdownSeconds -
+                    (Time.realtimeSinceStartup - warningStartedAt));
+            }
+        }
 
         // Called by the runtime host when an input-frame integration is available.
         public void Tick()
         {
             if (!started || !config.InactivityTimerEnabled) return;
-            if (HasUserActivity()) lastInputTime = Time.realtimeSinceStartup;
-            if (Time.realtimeSinceStartup - lastInputTime >= config.InactivityTimeoutSeconds)
+            if (!sessionActive())
             {
-                lastInputTime = Time.realtimeSinceStartup;
+                CancelWarning();
+                return;
+            }
+
+            var now = Time.realtimeSinceStartup;
+            if (HasUserActivity())
+            {
+                lastInputTime = now;
+                CancelWarning();
+                return;
+            }
+
+            if (!warningActive && now - lastInputTime >= config.InactivityTimeoutSeconds)
+            {
+                warningActive = true;
+                warningStartedAt = now;
+                WarningStarted?.Invoke(config.InactivityQuitCountdownSeconds);
+            }
+
+            if (!warningActive) return;
+
+            var remaining = WarningRemainingSeconds;
+            WarningUpdated?.Invoke(remaining);
+            if (remaining <= 0f)
+            {
+                warningActive = false;
                 TimedOut?.Invoke();
             }
+        }
+
+        private void CancelWarning()
+        {
+            if (!warningActive) return;
+            warningActive = false;
+            WarningCancelled?.Invoke();
         }
 
         private bool HasUserActivity()

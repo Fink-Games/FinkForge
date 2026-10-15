@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- Added the inactivity warning countdown and automatic application shutdown after the configured inactivity periods.
+- Added public inactivity warning events and countdown state for game-owned warning UI.
+- Kept heartbeat delivery active after `SendScores()` until restart or quit is requested.
+
 ## 0.6.1
 
 - Removed the fixed three-second delay from application shutdown. Editor Play Mode and Player builds now quit immediately after the end flow is requested.

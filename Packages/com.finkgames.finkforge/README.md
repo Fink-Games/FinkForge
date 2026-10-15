@@ -207,6 +207,24 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 Bu değer `scoreEnabled` değerinden bağımsızdır. Skorsuz bir oyun takımlı olabilir.
 
+### Inactivity uyarısı ve otomatik kapanış
+
+Context içindeki `inactivityTimeoutSeconds` kadar süre input alınmazsa inactivity uyarısı başlar. Bu uyarı sırasında `inactivityQuitCountdownSeconds` kadar süre boyunca input gelmezse Fink Forge skor/end akışını çalıştırıp uygulamayı kapatır. Oyuncu ekrana dokunur veya input üretirse countdown iptal edilir.
+
+Oyun kendi UI'ında oyuncuya uyarı gösterebilir:
+
+```csharp
+Fink.Inactivity.OnWarningStarted += ShowInactivityWarning;
+Fink.Inactivity.OnWarningUpdated += UpdateInactivityCountdown;
+Fink.Inactivity.OnWarningCancelled += HideInactivityWarning;
+
+void ShowInactivityWarning(float seconds) { /* "Ekrana dokun" UI'ını aç */ }
+void UpdateInactivityCountdown(float seconds) { /* countdown text'ini güncelle */ }
+void HideInactivityWarning() { /* UI'ı kapat */ }
+```
+
+`Fink.Inactivity.IsWarningActive` ve `Fink.Inactivity.WarningRemainingSeconds` değerleri de UI tarafından okunabilir.
+
 ### Oyun ayarını oluşturma
 
 Score delivery için oyun adını `FinkForgeConfig` üzerinden tanımlayın:

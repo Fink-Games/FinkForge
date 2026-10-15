@@ -48,6 +48,27 @@ namespace FinkForge
             public static string Language => FinkRuntime.Instance.Config.Language;
         }
 
+        public static class Inactivity
+        {
+            public static bool IsWarningActive => FinkRuntime.Instance.InactivityWarningActive;
+            public static float WarningRemainingSeconds => FinkRuntime.Instance.InactivityWarningRemainingSeconds;
+            public static event Action<float> OnWarningStarted
+            {
+                add => FinkRuntime.Instance.InactivityWarningStarted += value;
+                remove => FinkRuntime.Instance.InactivityWarningStarted -= value;
+            }
+            public static event Action<float> OnWarningUpdated
+            {
+                add => FinkRuntime.Instance.InactivityWarningUpdated += value;
+                remove => FinkRuntime.Instance.InactivityWarningUpdated -= value;
+            }
+            public static event Action OnWarningCancelled
+            {
+                add => FinkRuntime.Instance.InactivityWarningCancelled += value;
+                remove => FinkRuntime.Instance.InactivityWarningCancelled -= value;
+            }
+        }
+
         public static class Launch
         {
             public static bool IsConfigured => FinkRuntime.Instance.LaunchIsConfigured;
