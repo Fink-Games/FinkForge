@@ -10,9 +10,11 @@ namespace FinkForge.Inactivity
     {
         private readonly ConfigService config;
         private readonly System.Func<bool> sessionActive;
+        private readonly System.Func<bool> paused;
         private float lastInputTime;
         private bool started;
         private bool warningActive;
+        private bool timeoutRaised;
         private float warningStartedAt;
         private bool hasPointerPosition;
         private Vector2 lastPointerPosition;
@@ -22,10 +24,11 @@ namespace FinkForge.Inactivity
         public event System.Action<float> WarningStarted;
         public event System.Action<float> WarningUpdated;
         public event System.Action WarningCancelled;
-        public InactivityService(ConfigService config, System.Func<bool> sessionActive)
+        public InactivityService(ConfigService config, System.Func<bool> sessionActive, System.Func<bool> paused)
         {
             this.config = config;
             this.sessionActive = sessionActive;
+            this.paused = paused;
         }
 
         public void Start() { started = true; lastInputTime = Time.realtimeSinceStartup; }
@@ -46,7 +49,7 @@ namespace FinkForge.Inactivity
         public void Tick()
         {
             if (!started || !config.InactivityTimerEnabled) return;
-            if (!sessionActive())
+            if (!sessionActive() || paused())
             {
                 CancelWarning();
                 return;
@@ -56,9 +59,12 @@ namespace FinkForge.Inactivity
             if (HasUserActivity())
             {
                 lastInputTime = now;
+                timeoutRaised = false;
                 CancelWarning();
                 return;
             }
+
+            if (timeoutRaised) return;
 
             if (!warningActive && now - lastInputTime >= config.InactivityTimeoutSeconds)
             {
@@ -74,6 +80,7 @@ namespace FinkForge.Inactivity
             if (remaining <= 0f)
             {
                 warningActive = false;
+                timeoutRaised = true;
                 TimedOut?.Invoke();
             }
         }

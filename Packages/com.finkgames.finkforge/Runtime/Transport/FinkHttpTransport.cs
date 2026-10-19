@@ -66,6 +66,16 @@ namespace FinkForge.Transport
             return true;
         }
 
+        public async UniTask<FinkPauseState> GetPauseStateAsync()
+        {
+            var response = await SendRequestAsync(UnityWebRequest.kHttpVerbGET, "/v1/game/pause", null);
+            EnsureSuccess(response);
+            var state = JsonUtility.FromJson<FinkPauseState>(response.Body);
+            if (state == null)
+                throw new FinkTransportException("Pause response was malformed.", false);
+            return state;
+        }
+
         private string GetPath(FinkDeliveryType type)
         {
             switch (type)

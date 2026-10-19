@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0
+
+- Added polling for `GET /v1/game/pause` during active sessions.
+- Added `Fink.Application.OnPauseStateChanged` so games can pause and resume gameplay while Electron displays the credit screen.
+- Paused inactivity tracking while the table is paused.
+- Unity does not create or control the Electron credit screen.
+
 ## 0.7.0
 
 - Added the inactivity warning countdown and automatic application shutdown after the configured inactivity periods.

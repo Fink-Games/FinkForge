@@ -8,6 +8,7 @@ namespace FinkForge.Transport
     {
         void Prepare();
         UniTask LoadBootstrapDataAsync(PlayerService players, ConfigService config);
+        UniTask<FinkPauseState> GetPauseStateAsync();
         UniTask<bool> SendAsync(PendingDelivery delivery);
     }
 
@@ -78,6 +79,14 @@ namespace FinkForge.Transport
         // This field is a backend/configuration flag and is intentionally not used to infer team play.
         public bool teamModeEnabled;
         public RuntimePlayerDto[] players;
+    }
+
+    internal sealed class FinkPauseState
+    {
+        public bool Success;
+        public bool Paused;
+        public string Reason;
+        public string Until;
     }
 
     [System.Serializable]

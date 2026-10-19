@@ -194,9 +194,9 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 This value is independent of `scoreEnabled`; a scoreless game can still use teams.
 
-### Inactivity warning and automatic shutdown
+### Inactivity warning and timeout event
 
-When no input is received for `inactivityTimeoutSeconds`, the inactivity warning starts. If no input arrives during `inactivityQuitCountdownSeconds`, Fink Forge runs the score/end flow and quits the application. Any touch or other supported input cancels the countdown.
+When no input is received for `inactivityTimeoutSeconds`, the inactivity warning starts. If no input arrives during `inactivityQuitCountdownSeconds`, the package raises `OnTimeout`. Fink Forge does not quit by itself; the game decides what to do. Any touch or other supported input cancels the countdown.
 
 The game can show its own warning UI:
 
@@ -204,13 +204,31 @@ The game can show its own warning UI:
 Fink.Inactivity.OnWarningStarted += ShowInactivityWarning;
 Fink.Inactivity.OnWarningUpdated += UpdateInactivityCountdown;
 Fink.Inactivity.OnWarningCancelled += HideInactivityWarning;
+Fink.Inactivity.OnTimeout += HandleInactivityTimeout;
 
 void ShowInactivityWarning(float seconds) { /* Show "Touch the screen" UI */ }
 void UpdateInactivityCountdown(float seconds) { /* Update countdown text */ }
 void HideInactivityWarning() { /* Hide UI */ }
+void HandleInactivityTimeout() { /* Decide whether to call Fink.Application.Quit() */ }
 ```
 
 The UI can also read `Fink.Inactivity.IsWarningActive` and `Fink.Inactivity.WarningRemainingSeconds`.
+
+### Table pause state
+
+During an active session, the package polls `GET /v1/game/pause` at a short interval. The credit screen is displayed by Electron; Unity does not create this screen. When the response contains `paused: true`, `Fink.Application.OnPauseStateChanged` is raised and the inactivity timer pauses. The game pauses its gameplay flow. When `paused: false` is returned, the event is raised again and gameplay and inactivity resume.
+
+```csharp
+Fink.Application.OnPauseStateChanged += HandlePauseState;
+
+void HandlePauseStateChanged(bool paused, string reason, string until)
+{
+    if (paused)
+        PauseGameplay(reason, until);
+    else
+        ResumeGameplay();
+}
+```
 
 ### Creating the game configuration
 

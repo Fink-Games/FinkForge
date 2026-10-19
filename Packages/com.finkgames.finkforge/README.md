@@ -207,9 +207,9 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 Bu değer `scoreEnabled` değerinden bağımsızdır. Skorsuz bir oyun takımlı olabilir.
 
-### Inactivity uyarısı ve otomatik kapanış
+### Inactivity uyarısı ve timeout event'i
 
-Context içindeki `inactivityTimeoutSeconds` kadar süre input alınmazsa inactivity uyarısı başlar. Bu uyarı sırasında `inactivityQuitCountdownSeconds` kadar süre boyunca input gelmezse Fink Forge skor/end akışını çalıştırıp uygulamayı kapatır. Oyuncu ekrana dokunur veya input üretirse countdown iptal edilir.
+Context içindeki `inactivityTimeoutSeconds` kadar süre input alınmazsa inactivity uyarısı başlar. Bu uyarı sırasında `inactivityQuitCountdownSeconds` kadar süre boyunca input gelmezse `OnTimeout` event'i yayınlanır. Fink Forge kendi başına uygulamayı kapatmaz; oyun bu event'te kendi kararını verir. Oyuncu ekrana dokunur veya input üretirse countdown iptal edilir.
 
 Oyun kendi UI'ında oyuncuya uyarı gösterebilir:
 
@@ -217,13 +217,45 @@ Oyun kendi UI'ında oyuncuya uyarı gösterebilir:
 Fink.Inactivity.OnWarningStarted += ShowInactivityWarning;
 Fink.Inactivity.OnWarningUpdated += UpdateInactivityCountdown;
 Fink.Inactivity.OnWarningCancelled += HideInactivityWarning;
+Fink.Inactivity.OnTimeout += HandleInactivityTimeout;
 
 void ShowInactivityWarning(float seconds) { /* "Ekrana dokun" UI'ını aç */ }
 void UpdateInactivityCountdown(float seconds) { /* countdown text'ini güncelle */ }
 void HideInactivityWarning() { /* UI'ı kapat */ }
+void HandleInactivityTimeout()
+{
+    // Oyun kendi kararını verir; gerekiyorsa burada Fink.Application.Quit() çağırılır.
+}
 ```
 
 `Fink.Inactivity.IsWarningActive` ve `Fink.Inactivity.WarningRemainingSeconds` değerleri de UI tarafından okunabilir.
+
+### Masa pause durumu
+
+Aktif session sırasında package, kısa aralıklarla `GET /v1/game/pause` endpoint'ini kontrol eder. Kredi ekranı Electron tarafından gösterilir; Unity oyunu bu ekranı oluşturmaz. Response içindeki `paused: true` değeri geldiğinde `Fink.Application.OnPauseStateChanged` yayınlanır ve inactivity timer durur. Oyun bu event'te gameplay akışını pause eder. `paused: false` geldiğinde event tekrar yayınlanır ve oyun ile inactivity devam eder.
+
+```csharp
+Fink.Application.OnPauseStateChanged += HandlePauseState;
+
+void HandlePauseStateChanged(bool paused, string reason, string until)
+{
+    if (paused)
+        PauseGameplay(reason, until);
+    else
+        ResumeGameplay();
+}
+```
+
+Örnek response:
+
+```json
+{
+  "success": true,
+  "paused": true,
+  "reason": "credit_exhausted",
+  "until": "2026-10-16T18:04:30.000Z"
+}
+```
 
 ### Oyun ayarını oluşturma
 

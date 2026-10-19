@@ -30,6 +30,7 @@ namespace FinkForge.Core
         public readonly DeviceService Device;
         private readonly HeartbeatService _heartbeat;
         private readonly InactivityService _inactivity;
+        private readonly PauseService _pause;
         private readonly ApplicationService _application;
 
         private FinkRuntime()
@@ -44,9 +45,11 @@ namespace FinkForge.Core
                 () => Config.ScoreEnabled);
             _heartbeat = new HeartbeatService(_transport);
             App = new GameService(Players, Config, _finishOutbox, _heartbeat, _state, _settings);
+            _pause = new PauseService(_transport, OnPauseStateChanged);
+            App.SessionStarted += () => _pause.Start(Time.realtimeSinceStartup);
             _inactivity = new InactivityService(Config,
-                () => _state.CurrentSession != null && _state.CurrentSession.State == FinkSessionState.Active);
-            _inactivity.TimedOut += RequestQuit;
+                () => _state.CurrentSession != null && _state.CurrentSession.State == FinkSessionState.Active,
+                () => _pause != null && _pause.IsPaused);
             _application = new ApplicationService(App.Quit);
             Device = new DeviceService(_finishOutbox, RequestQuit);
             Players.AllPlayersLeft += RequestQuit;
@@ -88,6 +91,9 @@ namespace FinkForge.Core
         {
             _inactivity.Tick();
             _heartbeat.Tick(Time.realtimeSinceStartup);
+            if (_state.CurrentSession == null || _state.CurrentSession.State != FinkSessionState.Active)
+                _pause.Stop();
+            _pause.Tick(Time.realtimeSinceStartup);
             _finishOutbox.ProcessPending(Time.realtimeSinceStartup);
         }
 
@@ -95,6 +101,13 @@ namespace FinkForge.Core
 
         public bool InactivityWarningActive => _inactivity.IsWarningActive;
         public float InactivityWarningRemainingSeconds => _inactivity.WarningRemainingSeconds;
+        public bool IsPaused => _pause.IsPaused;
+        public event Action<bool, string, string> PauseStateChanged;
+        public event Action InactivityTimedOut
+        {
+            add => _inactivity.TimedOut += value;
+            remove => _inactivity.TimedOut -= value;
+        }
         public event Action<float> InactivityWarningStarted
         {
             add => _inactivity.WarningStarted += value;
@@ -109,6 +122,11 @@ namespace FinkForge.Core
         {
             add => _inactivity.WarningCancelled += value;
             remove => _inactivity.WarningCancelled -= value;
+        }
+
+        private void OnPauseStateChanged(bool paused, FinkPauseState state)
+        {
+            PauseStateChanged?.Invoke(paused, state?.Reason ?? string.Empty, state?.Until ?? string.Empty);
         }
 
         public void ConfigureGame(string gameName)

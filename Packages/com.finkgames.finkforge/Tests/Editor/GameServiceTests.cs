@@ -309,6 +309,11 @@ namespace FinkForge.Tests
 
             public void Prepare() { }
             public UniTask LoadBootstrapDataAsync(PlayerService players, ConfigService config) => UniTask.CompletedTask;
+            public UniTask<FinkPauseState> GetPauseStateAsync() => UniTask.FromResult(new FinkPauseState
+            {
+                Success = true,
+                Paused = false
+            });
 
             public async UniTask<bool> SendAsync(PendingDelivery delivery)
             {

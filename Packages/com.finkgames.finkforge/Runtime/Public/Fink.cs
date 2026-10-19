@@ -8,6 +8,12 @@ namespace FinkForge
     {
         public static class Application
         {
+            public static bool IsPaused => FinkRuntime.Instance.IsPaused;
+            public static event Action<bool, string, string> OnPauseStateChanged
+            {
+                add => FinkRuntime.Instance.PauseStateChanged += value;
+                remove => FinkRuntime.Instance.PauseStateChanged -= value;
+            }
             public static void Quit() => FinkRuntime.Instance.RequestQuit();
         }
 
@@ -52,6 +58,11 @@ namespace FinkForge
         {
             public static bool IsWarningActive => FinkRuntime.Instance.InactivityWarningActive;
             public static float WarningRemainingSeconds => FinkRuntime.Instance.InactivityWarningRemainingSeconds;
+            public static event Action OnTimeout
+            {
+                add => FinkRuntime.Instance.InactivityTimedOut += value;
+                remove => FinkRuntime.Instance.InactivityTimedOut -= value;
+            }
             public static event Action<float> OnWarningStarted
             {
                 add => FinkRuntime.Instance.InactivityWarningStarted += value;
