@@ -9,6 +9,7 @@ namespace FinkForge.Transport
         void Prepare();
         UniTask LoadBootstrapDataAsync(PlayerService players, ConfigService config);
         UniTask<FinkPauseState> GetPauseStateAsync();
+        UniTask SendLightRequestAsync(string method, string path, string json);
         UniTask<bool> SendAsync(PendingDelivery delivery);
     }
 

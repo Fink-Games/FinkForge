@@ -54,7 +54,7 @@ namespace FinkForge.Core
             try
             {
                 var state = await transport.GetPauseStateAsync();
-                if (state != null && state.Success)
+                if (running && state != null && state.Success)
                     SetPaused(state.Paused, state);
             }
             catch

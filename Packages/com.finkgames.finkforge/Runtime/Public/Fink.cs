@@ -80,6 +80,17 @@ namespace FinkForge
             }
         }
 
+        public static class Lights
+        {
+            public static void SendEvent(string type, int? seatId = null, int[] seats = null, string intensity = null) =>
+                FinkRuntime.Instance.SendLightEvent(type, seatId, seats, intensity);
+            public static void SetTurn(int seatId) => FinkRuntime.Instance.SetLightTurn(seatId);
+            public static void ClearTurn() => FinkRuntime.Instance.SetLightTurn(null);
+            public static void SetTimer(int durationMs, int? seatId = null) => FinkRuntime.Instance.SetLightTimer(durationMs, seatId);
+            public static void ClearTimer() => FinkRuntime.Instance.ClearLightTimer();
+            public static void ClearState() => FinkRuntime.Instance.ClearLightState();
+        }
+
         public static class Launch
         {
             public static bool IsConfigured => FinkRuntime.Instance.LaunchIsConfigured;

@@ -31,6 +31,7 @@ namespace FinkForge.Core
         private readonly HeartbeatService _heartbeat;
         private readonly InactivityService _inactivity;
         private readonly PauseService _pause;
+        private readonly LightService _lights;
         private readonly ApplicationService _application;
 
         private FinkRuntime()
@@ -46,6 +47,7 @@ namespace FinkForge.Core
             _heartbeat = new HeartbeatService(_transport);
             App = new GameService(Players, Config, _finishOutbox, _heartbeat, _state, _settings);
             _pause = new PauseService(_transport, OnPauseStateChanged);
+            _lights = new LightService(_transport);
             App.SessionStarted += () => _pause.Start(Time.realtimeSinceStartup);
             _inactivity = new InactivityService(Config,
                 () => _state.CurrentSession != null && _state.CurrentSession.State == FinkSessionState.Active,
@@ -102,6 +104,12 @@ namespace FinkForge.Core
         public bool InactivityWarningActive => _inactivity.IsWarningActive;
         public float InactivityWarningRemainingSeconds => _inactivity.WarningRemainingSeconds;
         public bool IsPaused => _pause.IsPaused;
+        public void SendLightEvent(string type, int? seatId, int[] seats, string intensity) =>
+            _lights.SendEvent(type, seatId, seats, intensity);
+        public void SetLightTurn(int? seatId) => _lights.SetTurn(seatId);
+        public void SetLightTimer(int durationMs, int? seatId) => _lights.SetTimer(durationMs, seatId);
+        public void ClearLightTimer() => _lights.ClearTimer();
+        public void ClearLightState() => _lights.ClearState();
         public event Action<bool, string, string> PauseStateChanged;
         public event Action InactivityTimedOut
         {

@@ -207,6 +207,17 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 Bu değer `scoreEnabled` değerinden bağımsızdır. Skorsuz bir oyun takımlı olabilir.
 
+### Masa ışıkları
+
+Işık çağrıları lifecycle'dan bağımsızdır ve oyunu bekletmez. Oyun `Fink.Lights.SendEvent`, `SetTurn`, `SetTimer`, `ClearTimer` ve `ClearState` API'lerini kullanabilir. Çağrılar arka planda yaklaşık 500 ms timeout ile yapılır; başarısız ışık çağrıları tekrar denenmez.
+
+```csharp
+Fink.Lights.SendEvent("score", seatId: 2);
+Fink.Lights.SendEvent("win", seats: new[] { 0, 2 });
+Fink.Lights.SetTurn(3);
+Fink.Lights.SetTimer(15000, seatId: 3);
+```
+
 ### Oyun ayarını oluşturma
 
 Score delivery için oyun adını `FinkForgeConfig` üzerinden tanımlayın:

@@ -194,6 +194,17 @@ bool usesTeams = Fink.Players.UsesTeams;
 
 This value is independent of `scoreEnabled`; a scoreless game can still use teams.
 
+### Table lights
+
+Light calls are independent from the lifecycle and never block gameplay. Games can use `Fink.Lights.SendEvent`, `SetTurn`, `SetTimer`, `ClearTimer`, and `ClearState`. Calls run in the background with an approximately 500 ms timeout and failed light calls are never retried.
+
+```csharp
+Fink.Lights.SendEvent("score", seatId: 2);
+Fink.Lights.SendEvent("win", seats: new[] { 0, 2 });
+Fink.Lights.SetTurn(3);
+Fink.Lights.SetTimer(15000, seatId: 3);
+```
+
 ### Creating the game configuration
 
 Create the game configuration through the Unity menu:

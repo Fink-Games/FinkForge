@@ -76,6 +76,18 @@ namespace FinkForge.Transport
             return state;
         }
 
+        public async UniTask SendLightRequestAsync(string method, string path, string json)
+        {
+            try
+            {
+                await SendRequestAsync(method, path, json).Timeout(TimeSpan.FromMilliseconds(500));
+            }
+            catch
+            {
+                // Lights are visual telemetry. Never block gameplay or retry a light call.
+            }
+        }
+
         private string GetPath(FinkDeliveryType type)
         {
             switch (type)

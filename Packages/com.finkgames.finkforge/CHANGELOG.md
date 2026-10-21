@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+
+- Added independent table light event and persistent-state APIs.
+- Added short, non-blocking light requests with no retry or outbox delivery.
+- Added seat events, multi-seat events, turn state, countdown state, and light-state clearing.
+
 ## 0.8.0
 
 - Added polling for `GET /v1/game/pause` during active sessions.

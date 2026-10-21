@@ -230,6 +230,23 @@ void HandlePauseStateChanged(bool paused, string reason, string until)
 }
 ```
 
+### Table lights
+
+Light calls are independent from the lifecycle and never block gameplay. If a Table has no lights or lights are disabled, the call can be safely ignored.
+
+```csharp
+Fink.Lights.SendEvent("score", seatId: 2);
+Fink.Lights.SendEvent("win", seats: new[] { 0, 2 });
+Fink.Lights.SendEvent("bonus", seatId: 1, intensity: "big");
+
+Fink.Lights.SetTurn(3);
+Fink.Lights.SetTimer(15000, seatId: 3);
+Fink.Lights.ClearTimer();
+Fink.Lights.ClearState();
+```
+
+`SendEvent` uses `/v1/lights/event`, state calls use `/v1/lights/state`, and `ClearState` sends `DELETE /v1/lights/state`. Calls run in the background with an approximately 500 ms timeout and failed light calls are never retried.
+
 ### Creating the game configuration
 
 Create the game configuration through the Unity menu:

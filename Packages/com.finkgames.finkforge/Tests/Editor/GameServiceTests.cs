@@ -314,6 +314,7 @@ namespace FinkForge.Tests
                 Success = true,
                 Paused = false
             });
+            public UniTask SendLightRequestAsync(string method, string path, string json) => UniTask.CompletedTask;
 
             public async UniTask<bool> SendAsync(PendingDelivery delivery)
             {

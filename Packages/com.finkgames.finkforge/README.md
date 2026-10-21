@@ -257,6 +257,23 @@ void HandlePauseStateChanged(bool paused, string reason, string until)
 }
 ```
 
+### Masa ışıkları
+
+Işık çağrıları lifecycle'dan bağımsızdır ve oyunu bekletmez. Table ışık desteği yoksa veya ışıklar kapalıysa çağrı güvenle yok sayılabilir.
+
+```csharp
+Fink.Lights.SendEvent("score", seatId: 2);
+Fink.Lights.SendEvent("win", seats: new[] { 0, 2 });
+Fink.Lights.SendEvent("bonus", seatId: 1, intensity: "big");
+
+Fink.Lights.SetTurn(3);
+Fink.Lights.SetTimer(15000, seatId: 3);
+Fink.Lights.ClearTimer();
+Fink.Lights.ClearState();
+```
+
+`SendEvent` `/v1/lights/event`, state çağrıları `/v1/lights/state`, `ClearState` ise `DELETE /v1/lights/state` kullanır. Çağrılar arka planda yapılır, yaklaşık 500 ms timeout kullanır ve başarısız ışık çağrıları tekrar denenmez.
+
 ### Oyun ayarını oluşturma
 
 Score delivery için oyun adını `FinkForgeConfig` üzerinden tanımlayın:
